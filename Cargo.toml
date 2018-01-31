@@ -1,0 +1,18 @@
+[package]
+name = "elipticoin-base-contracts"
+version = "0.1.0"
+authors = ["Mason Fischer <mason@kissr.co>"]
+
+[build-dependencies]
+protoc-rust = "1.4"
+protoc-rust-grpc = { path = "../grpc-rust/protoc-rust-grpc" }
+
+[dependencies]
+hex-slice =  "0.1.2"
+grpc = { path = "../grpc-rust/grpc" }
+protoc-rust = "1.4"
+protobuf        = "1.*"
+tls-api         = "0.*"
+futures         = "0.*"
+bytes =           "0.*"
+

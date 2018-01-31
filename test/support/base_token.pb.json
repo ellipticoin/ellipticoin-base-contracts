@@ -1,0 +1,32 @@
+{
+  "nested": {
+    "elipticoin": {
+      "nested": {
+        "BaseToken": {
+          "methods": {
+            "BalanceOf": {
+              "requestType": "Address",
+              "responseType": "Balance"
+            }
+          }
+        },
+        "Address": {
+          "fields": {
+            "bytes": {
+              "type": "bytes",
+              "id": 1
+            }
+          }
+        },
+        "Balance": {
+          "fields": {
+            "bytes": {
+              "type": "uint64",
+              "id": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+syntax = "proto3";
+package elipticoin;
+
+message Call {
+  string function_name = 1;
+  string aguments_message_type = 2;
+  bytes arguments = 3;
+}
