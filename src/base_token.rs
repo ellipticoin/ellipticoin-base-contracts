@@ -1,7 +1,11 @@
-pub use protos::base_token::*;
+pub struct BaseToken;
 
-pub fn balance_of(_req: Address) -> Balance {
-    let mut r = Balance::new();
-    r.set_amount(99);
-    r
+impl BaseToken {
+    pub fn balance_of(address: Vec<u8>) -> u64 {
+        if address == vec![ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ] {
+            99
+        } else {
+            101
+        }
+    }
 }

@@ -3,9 +3,10 @@ const readFile = Promise.promisify(require("fs").readFile);
 var exec = Promise.promisify(require('child_process').exec);
 const FakeBlockchain = require('./support/fake-blockchain');
 const assert = require('assert');
-const {hexToAddress, bytesToHex} = require('./support/utils.js');
-const SENDER = hexToAddress("0x0000000000000000000000000000000000000001");
-const RECEIVER = hexToAddress("0x0000000000000000000000000000000000000002");
+const {elipticoin: {Address, Balance}} = require('./support/base_token.pb.js');
+const {hexToAddress, hexToBytes, bytesToHex} = require('./support/utils.js');
+const SENDER = hexToAddress("0000000000000000000000000000000000000001");
+const RECEIVER = hexToAddress("0000000000000000000000000000000000000002");
 const ERROR_INSUFFICIENT_FUNDS = 1;
 
 global.storage = {};
@@ -25,8 +26,8 @@ describe('token', function() {
   var wasm;
 
   before(async function () {
-    this.timeout(3000);
-    var result = await exec('mkdir -p _build && rustc +nightly --target wasm32-unknown-unknown -O --crate-type=cdylib src/token.rs -o _build/token.big.wasm && wasm-gc _build/token.big.wasm _build/token.wasm');
+    this.timeout(10000);
+    var result = await exec('cargo +nightly rustc --target wasm32-unknown-unknown --lib -- -O');
     console.log("--- Running make ---")
     console.log(result);
     console.log("--------------------")
@@ -34,10 +35,10 @@ describe('token', function() {
   });
 
   beforeEach(async () => {
-    this.timeout(3000);
+    this.timeout(10000);
     storage = {};
     wasm = new FakeBlockchain({exports});
-    code = await readFile("./_build/token.wasm");
+    code = await readFile("target/wasm32-unknown-unknown/debug/elipticoin_base_contracts.wasm");
     await wasm.load(code);
     // await wasm.call("_initialize")
   });
@@ -48,11 +49,13 @@ describe('token', function() {
     });
   });
 
-  describe.only('get_balance', function() {
+  describe.only('balance_of', function() {
     it('should return your balance', async function() {
-      assert.equal(await wasm.call(
-        'balance_of', SENDER,
-      ), 100);
+      wasm.writePointer(SENDER);
+      var result = await wasm.call('balance_of', 0);
+    
+      var decodedBalance = Balance.decode(new Buffer(wasm.readPointer(result)));
+      assert.equal(decodedBalance.amount.toNumber(), 101);
     });
   });
 

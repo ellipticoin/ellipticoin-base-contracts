@@ -367,7 +367,7 @@ impl ::protobuf::reflect::ProtobufValue for Balance {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x10base_token.proto\x12\nelipticoin\"\x1f\n\x07Address\x12\x14\n\x05b\
+    \n\x10elipticoin.proto\x12\nelipticoin\"\x1f\n\x07Address\x12\x14\n\x05b\
     ytes\x18\x01\x20\x01(\x0cR\x05bytes\"!\n\x07Balance\x12\x16\n\x06amount\
     \x18\x01\x20\x01(\x04R\x06amount2D\n\tBaseToken\x127\n\tBalanceOf\x12\
     \x13.elipticoin.Address\x1a\x13.elipticoin.Balance\"\0b\x06proto3\

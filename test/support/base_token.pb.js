@@ -282,7 +282,7 @@ $root.elipticoin = (function() {
          * Properties of a Balance.
          * @memberof elipticoin
          * @interface IBalance
-         * @property {number|Long|null} [bytes] Balance bytes
+         * @property {number|Long|null} [amount] Balance amount
          */
 
         /**
@@ -301,12 +301,12 @@ $root.elipticoin = (function() {
         }
 
         /**
-         * Balance bytes.
-         * @member {number|Long} bytes
+         * Balance amount.
+         * @member {number|Long} amount
          * @memberof elipticoin.Balance
          * @instance
          */
-        Balance.prototype.bytes = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+        Balance.prototype.amount = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
         /**
          * Creates a new Balance instance using the specified properties.
@@ -332,8 +332,8 @@ $root.elipticoin = (function() {
         Balance.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.bytes != null && message.hasOwnProperty("bytes"))
-                writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.bytes);
+            if (message.amount != null && message.hasOwnProperty("amount"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.amount);
             return writer;
         };
 
@@ -369,7 +369,7 @@ $root.elipticoin = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.bytes = reader.uint64();
+                    message.amount = reader.uint64();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -406,9 +406,9 @@ $root.elipticoin = (function() {
         Balance.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.bytes != null && message.hasOwnProperty("bytes"))
-                if (!$util.isInteger(message.bytes) && !(message.bytes && $util.isInteger(message.bytes.low) && $util.isInteger(message.bytes.high)))
-                    return "bytes: integer|Long expected";
+            if (message.amount != null && message.hasOwnProperty("amount"))
+                if (!$util.isInteger(message.amount) && !(message.amount && $util.isInteger(message.amount.low) && $util.isInteger(message.amount.high)))
+                    return "amount: integer|Long expected";
             return null;
         };
 
@@ -424,15 +424,15 @@ $root.elipticoin = (function() {
             if (object instanceof $root.elipticoin.Balance)
                 return object;
             var message = new $root.elipticoin.Balance();
-            if (object.bytes != null)
+            if (object.amount != null)
                 if ($util.Long)
-                    (message.bytes = $util.Long.fromValue(object.bytes)).unsigned = true;
-                else if (typeof object.bytes === "string")
-                    message.bytes = parseInt(object.bytes, 10);
-                else if (typeof object.bytes === "number")
-                    message.bytes = object.bytes;
-                else if (typeof object.bytes === "object")
-                    message.bytes = new $util.LongBits(object.bytes.low >>> 0, object.bytes.high >>> 0).toNumber(true);
+                    (message.amount = $util.Long.fromValue(object.amount)).unsigned = true;
+                else if (typeof object.amount === "string")
+                    message.amount = parseInt(object.amount, 10);
+                else if (typeof object.amount === "number")
+                    message.amount = object.amount;
+                else if (typeof object.amount === "object")
+                    message.amount = new $util.LongBits(object.amount.low >>> 0, object.amount.high >>> 0).toNumber(true);
             return message;
         };
 
@@ -452,14 +452,14 @@ $root.elipticoin = (function() {
             if (options.defaults)
                 if ($util.Long) {
                     var long = new $util.Long(0, 0, true);
-                    object.bytes = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                    object.amount = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
-                    object.bytes = options.longs === String ? "0" : 0;
-            if (message.bytes != null && message.hasOwnProperty("bytes"))
-                if (typeof message.bytes === "number")
-                    object.bytes = options.longs === String ? String(message.bytes) : message.bytes;
+                    object.amount = options.longs === String ? "0" : 0;
+            if (message.amount != null && message.hasOwnProperty("amount"))
+                if (typeof message.amount === "number")
+                    object.amount = options.longs === String ? String(message.amount) : message.amount;
                 else
-                    object.bytes = options.longs === String ? $util.Long.prototype.toString.call(message.bytes) : options.longs === Number ? new $util.LongBits(message.bytes.low >>> 0, message.bytes.high >>> 0).toNumber(true) : message.bytes;
+                    object.amount = options.longs === String ? $util.Long.prototype.toString.call(message.amount) : options.longs === Number ? new $util.LongBits(message.amount.low >>> 0, message.amount.high >>> 0).toNumber(true) : message.amount;
             return object;
         };
 
@@ -477,220 +477,275 @@ $root.elipticoin = (function() {
         return Balance;
     })();
 
-    elipticoin.Call = (function() {
+    return elipticoin;
+})();
+
+$root.snazzy = (function() {
+
+    /**
+     * Namespace snazzy.
+     * @exports snazzy
+     * @namespace
+     */
+    var snazzy = {};
+
+    snazzy.items = (function() {
 
         /**
-         * Properties of a Call.
-         * @memberof elipticoin
-         * @interface ICall
-         * @property {string|null} [functionName] Call functionName
-         * @property {Uint8Array|null} ["arguments"] Call arguments
+         * Namespace items.
+         * @memberof snazzy
+         * @namespace
          */
+        var items = {};
 
-        /**
-         * Constructs a new Call.
-         * @memberof elipticoin
-         * @classdesc Represents a Call.
-         * @implements ICall
-         * @constructor
-         * @param {elipticoin.ICall=} [properties] Properties to set
-         */
-        function Call(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
+        items.Shirt = (function() {
 
-        /**
-         * Call functionName.
-         * @member {string} functionName
-         * @memberof elipticoin.Call
-         * @instance
-         */
-        Call.prototype.functionName = "";
+            /**
+             * Properties of a Shirt.
+             * @memberof snazzy.items
+             * @interface IShirt
+             * @property {string|null} [color] Shirt color
+             * @property {snazzy.items.Shirt.Size|null} [size] Shirt size
+             */
 
-        /**
-         * Call arguments.
-         * @member {Uint8Array} arguments
-         * @memberof elipticoin.Call
-         * @instance
-         */
-        Call.prototype["arguments"] = $util.newBuffer([]);
+            /**
+             * Constructs a new Shirt.
+             * @memberof snazzy.items
+             * @classdesc Represents a Shirt.
+             * @implements IShirt
+             * @constructor
+             * @param {snazzy.items.IShirt=} [properties] Properties to set
+             */
+            function Shirt(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
 
-        /**
-         * Creates a new Call instance using the specified properties.
-         * @function create
-         * @memberof elipticoin.Call
-         * @static
-         * @param {elipticoin.ICall=} [properties] Properties to set
-         * @returns {elipticoin.Call} Call instance
-         */
-        Call.create = function create(properties) {
-            return new Call(properties);
-        };
+            /**
+             * Shirt color.
+             * @member {string} color
+             * @memberof snazzy.items.Shirt
+             * @instance
+             */
+            Shirt.prototype.color = "";
 
-        /**
-         * Encodes the specified Call message. Does not implicitly {@link elipticoin.Call.verify|verify} messages.
-         * @function encode
-         * @memberof elipticoin.Call
-         * @static
-         * @param {elipticoin.ICall} message Call message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        Call.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.functionName != null && message.hasOwnProperty("functionName"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.functionName);
-            if (message["arguments"] != null && message.hasOwnProperty("arguments"))
-                writer.uint32(/* id 2, wireType 2 =*/18).bytes(message["arguments"]);
-            return writer;
-        };
+            /**
+             * Shirt size.
+             * @member {snazzy.items.Shirt.Size} size
+             * @memberof snazzy.items.Shirt
+             * @instance
+             */
+            Shirt.prototype.size = 0;
 
-        /**
-         * Encodes the specified Call message, length delimited. Does not implicitly {@link elipticoin.Call.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof elipticoin.Call
-         * @static
-         * @param {elipticoin.ICall} message Call message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        Call.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
+            /**
+             * Creates a new Shirt instance using the specified properties.
+             * @function create
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {snazzy.items.IShirt=} [properties] Properties to set
+             * @returns {snazzy.items.Shirt} Shirt instance
+             */
+            Shirt.create = function create(properties) {
+                return new Shirt(properties);
+            };
 
-        /**
-         * Decodes a Call message from the specified reader or buffer.
-         * @function decode
-         * @memberof elipticoin.Call
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {elipticoin.Call} Call
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        Call.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.elipticoin.Call();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
+            /**
+             * Encodes the specified Shirt message. Does not implicitly {@link snazzy.items.Shirt.verify|verify} messages.
+             * @function encode
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {snazzy.items.IShirt} message Shirt message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Shirt.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.color != null && message.hasOwnProperty("color"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.color);
+                if (message.size != null && message.hasOwnProperty("size"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.size);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Shirt message, length delimited. Does not implicitly {@link snazzy.items.Shirt.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {snazzy.items.IShirt} message Shirt message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Shirt.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a Shirt message from the specified reader or buffer.
+             * @function decode
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {snazzy.items.Shirt} Shirt
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Shirt.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.snazzy.items.Shirt();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.color = reader.string();
+                        break;
+                    case 2:
+                        message.size = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a Shirt message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {snazzy.items.Shirt} Shirt
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Shirt.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a Shirt message.
+             * @function verify
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Shirt.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.color != null && message.hasOwnProperty("color"))
+                    if (!$util.isString(message.color))
+                        return "color: string expected";
+                if (message.size != null && message.hasOwnProperty("size"))
+                    switch (message.size) {
+                    default:
+                        return "size: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * Creates a Shirt message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {snazzy.items.Shirt} Shirt
+             */
+            Shirt.fromObject = function fromObject(object) {
+                if (object instanceof $root.snazzy.items.Shirt)
+                    return object;
+                var message = new $root.snazzy.items.Shirt();
+                if (object.color != null)
+                    message.color = String(object.color);
+                switch (object.size) {
+                case "SMALL":
+                case 0:
+                    message.size = 0;
+                    break;
+                case "MEDIUM":
                 case 1:
-                    message.functionName = reader.string();
+                    message.size = 1;
                     break;
+                case "LARGE":
                 case 2:
-                    message["arguments"] = reader.bytes();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
+                    message.size = 2;
                     break;
                 }
-            }
-            return message;
-        };
+                return message;
+            };
 
-        /**
-         * Decodes a Call message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof elipticoin.Call
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {elipticoin.Call} Call
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        Call.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a Call message.
-         * @function verify
-         * @memberof elipticoin.Call
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        Call.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.functionName != null && message.hasOwnProperty("functionName"))
-                if (!$util.isString(message.functionName))
-                    return "functionName: string expected";
-            if (message["arguments"] != null && message.hasOwnProperty("arguments"))
-                if (!(message["arguments"] && typeof message["arguments"].length === "number" || $util.isString(message["arguments"])))
-                    return "arguments: buffer expected";
-            return null;
-        };
-
-        /**
-         * Creates a Call message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof elipticoin.Call
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {elipticoin.Call} Call
-         */
-        Call.fromObject = function fromObject(object) {
-            if (object instanceof $root.elipticoin.Call)
+            /**
+             * Creates a plain object from a Shirt message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof snazzy.items.Shirt
+             * @static
+             * @param {snazzy.items.Shirt} message Shirt
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Shirt.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults) {
+                    object.color = "";
+                    object.size = options.enums === String ? "SMALL" : 0;
+                }
+                if (message.color != null && message.hasOwnProperty("color"))
+                    object.color = message.color;
+                if (message.size != null && message.hasOwnProperty("size"))
+                    object.size = options.enums === String ? $root.snazzy.items.Shirt.Size[message.size] : message.size;
                 return object;
-            var message = new $root.elipticoin.Call();
-            if (object.functionName != null)
-                message.functionName = String(object.functionName);
-            if (object["arguments"] != null)
-                if (typeof object["arguments"] === "string")
-                    $util.base64.decode(object["arguments"], message["arguments"] = $util.newBuffer($util.base64.length(object["arguments"])), 0);
-                else if (object["arguments"].length)
-                    message["arguments"] = object["arguments"];
-            return message;
-        };
+            };
 
-        /**
-         * Creates a plain object from a Call message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof elipticoin.Call
-         * @static
-         * @param {elipticoin.Call} message Call
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        Call.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.functionName = "";
-                object["arguments"] = options.bytes === String ? "" : [];
-            }
-            if (message.functionName != null && message.hasOwnProperty("functionName"))
-                object.functionName = message.functionName;
-            if (message["arguments"] != null && message.hasOwnProperty("arguments"))
-                object["arguments"] = options.bytes === String ? $util.base64.encode(message["arguments"], 0, message["arguments"].length) : options.bytes === Array ? Array.prototype.slice.call(message["arguments"]) : message["arguments"];
-            return object;
-        };
+            /**
+             * Converts this Shirt to JSON.
+             * @function toJSON
+             * @memberof snazzy.items.Shirt
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Shirt.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
 
-        /**
-         * Converts this Call to JSON.
-         * @function toJSON
-         * @memberof elipticoin.Call
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        Call.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
+            /**
+             * Size enum.
+             * @name snazzy.items.Shirt.Size
+             * @enum {string}
+             * @property {number} SMALL=0 SMALL value
+             * @property {number} MEDIUM=1 MEDIUM value
+             * @property {number} LARGE=2 LARGE value
+             */
+            Shirt.Size = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "SMALL"] = 0;
+                values[valuesById[1] = "MEDIUM"] = 1;
+                values[valuesById[2] = "LARGE"] = 2;
+                return values;
+            })();
 
-        return Call;
+            return Shirt;
+        })();
+
+        return items;
     })();
 
-    return elipticoin;
+    return snazzy;
 })();
 
 module.exports = $root;
