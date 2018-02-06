@@ -27,10 +27,10 @@ describe('token', function() {
 
   before(async function () {
     this.timeout(10000);
-    var result = await exec('cargo +nightly rustc --target wasm32-unknown-unknown --lib -- -O');
-    console.log("--- Running make ---")
-    console.log(result);
-    console.log("--------------------")
+    // var result = await exec('cargo +nightly rustc --target wasm32-unknown-unknown --lib -- -O');
+    // console.log("--- Running make ---")
+    // console.log(result);
+    // console.log("--------------------")
     return null;
   });
 
