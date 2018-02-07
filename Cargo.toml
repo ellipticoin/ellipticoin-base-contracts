@@ -10,6 +10,6 @@ protoc-rust = "1.4"
 crate_type = ["cdylib"]
 
 [dependencies]
-num = "0.*"
+bytes = { version = "0.4", features = ["serde"] }
 protobuf = "1.*"
 cask = "0.*"
