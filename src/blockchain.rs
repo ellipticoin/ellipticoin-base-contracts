@@ -37,5 +37,6 @@ pub trait BlockChain {
     fn read_u64(&self, Vec<u8>) -> u64;
     fn write_u64(&self, Vec<u8>, u64);
     fn sender(&self) -> Vec<u8>;
+    fn throw(&mut self, msg: &str);
 }
 

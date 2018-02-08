@@ -10,7 +10,6 @@ extern {
 
 pub struct ElipitcoinBlockchain {
 }
-
 impl BlockChain for ElipitcoinBlockchain {
     fn read_u32(&self, key: Vec<u8>) -> u32 {
       unsafe {
@@ -42,5 +41,9 @@ impl BlockChain for ElipitcoinBlockchain {
                 value_bytes.to_vec_u32().to_pointer_with_length(),
             );
         }
+    }
+
+    fn throw(&mut self, message: &str) {
+        println!("Error {:?}", message);
     }
 }
