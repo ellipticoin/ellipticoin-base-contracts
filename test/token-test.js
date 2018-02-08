@@ -13,11 +13,23 @@ global.storage = {};
 
 describe('token', function() {
   const exports = {
-    sender: () => SENDER,
-    read: function (key) {
-      return this.storage[key];
+    sender: () => {
+      wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
+      return 0;
     },
-    write: function (key, value) {
+    read: (keyPtr) => {
+      var key = wasm.readPointer(keyPtr);
+      if(this.storage[key]) {
+        wasm.writePointer(this.storage[key]);
+      } else {
+        wasm.writePointer(new Uint32Array([0,0,0,0,0,0,0,0]));
+      }
+      return 0;
+    },
+    write: (keyPtr, valuePtr) => {
+      var key = wasm.readPointer(keyPtr);
+      var value = wasm.readPointer(valuePtr);
+
       this.storage = this.storage || {};
       this.storage[key] = value;
     },
@@ -30,29 +42,7 @@ describe('token', function() {
     this.timeout(10000);
     storage = {};
     wasm = new FakeBlockchain({
-      exports:{
-        ...exports,
-        sender: () => {
-          wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
-          return 0;
-        },
-        read: (keyPtr) => {
-          var key = wasm.readPointer(keyPtr);
-          if(this.storage[key]) {
-            wasm.writePointer(this.storage[key]);
-          } else {
-            wasm.writePointer(new Uint32Array([0,0,0,0,0,0,0,0]));
-          }
-          return 0;
-        },
-        write: (keyPtr, valuePtr) => {
-          var key = wasm.readPointer(keyPtr);
-          var value = wasm.readPointer(valuePtr);
-
-          this.storage = this.storage || {};
-          this.storage[key] = value;
-        }
-      }
+        exports: exports,
     });
     code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
     await wasm.load(code);
@@ -100,11 +90,7 @@ describe('token', function() {
       storage = {};
       wasm = new FakeBlockchain({
         exports:{
-          // ...exports,
-          sender: () => {
-            wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
-            return 0;
-          },
+          ...exports,
           read: (keyPtr) => {
             var key = wasm.readPointer(keyPtr);
             if(this.storage[key]) {
@@ -121,10 +107,6 @@ describe('token', function() {
             this.storage = this.storage || {};
             this.storage[key] = value;
           },
-          throw: (msgPointer) => {
-            var message = wasm.readString(msgPointer);
-            assert.equal(message, "insufficient funds");
-          }
         },
       });
       code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
@@ -149,11 +131,7 @@ describe('token', function() {
       storage = {};
       wasm = new FakeBlockchain({
         exports:{
-          // ...exports,
-          sender: () => {
-            wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
-            return 0;
-          },
+          ...exports,
           read: (keyPtr) => {
             var key = wasm.readPointer(keyPtr);
             if(this.storage[key]) {
