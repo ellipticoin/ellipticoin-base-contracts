@@ -1,3 +1,4 @@
+#[cfg(test)]
 use std::fs;
 const TEST_DB_PATH: &str = "tmp/test.db";
 extern crate cask;
