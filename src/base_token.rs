@@ -4,7 +4,6 @@ pub struct BaseToken<T: BlockChain>  {
     pub blockchain: T
 }
 
-
 impl <B> BaseToken<B> where B: BlockChain {
     pub fn _initialize(&self) {
         self.blockchain.write_u64(self.blockchain.sender(), 100);
@@ -22,7 +21,7 @@ impl <B> BaseToken<B> where B: BlockChain {
             self.write(self.sender(), sender_balance - amount);
             self.write(receiver_address, receiver_balance + amount);
         } else {
-            self.blockchain.throw(&"insufficient funds");
+            self.blockchain.throw("insufficient funds");
         }
     }
 

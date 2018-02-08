@@ -3,7 +3,7 @@ const readFile = Promise.promisify(require("fs").readFile);
 var exec = Promise.promisify(require('child_process').exec);
 const FakeBlockchain = require('./support/fake-blockchain');
 const assert = require('assert');
-const {elipticoin: {Address, Balance}} = require('./support/base_token.pb.js');
+const {elipticoin: {Address, Balance, TransferArgs}} = require('./support/base_token.pb.js');
 const {hexToAddress, hexToBytes, bytesToHex} = require('./support/utils.js');
 const SENDER = hexToAddress("0000000000000000000000000000000000000001");
 const RECEIVER = hexToAddress("0000000000000000000000000000000000000002");
@@ -38,7 +38,11 @@ describe('token', function() {
         },
         read: (keyPtr) => {
           var key = wasm.readPointer(keyPtr);
-          wasm.writePointer(this.storage[key]);
+          if(this.storage[key]) {
+            wasm.writePointer(this.storage[key]);
+          } else {
+            wasm.writePointer(new Uint32Array([0,0,0,0,0,0,0,0]));
+          }
           return 0;
         },
         write: (keyPtr, valuePtr) => {
@@ -75,30 +79,114 @@ describe('token', function() {
     });
   });
 
-  describe.skip('transfer', function() {
+  describe('transfer', function() {
     it('decreases the senders balance', async function() {
-      await wasm.call("transfer", [RECEIVER, 20]);
-      assert.equal(await wasm.call("get_balance", [SENDER]), 80);
+      var transferArgs = TransferArgs.encode(TransferArgs.create({
+        receiverAddress: hexToBytes("0000000000000000000000000000000000000002"),
+        amount: 20,
+      })).finish();
+      var t = TransferArgs.decode(transferArgs)
+
+      wasm.writePointer(transferArgs);
+      await wasm.call("transfer", 0);
+
+      wasm.writePointer(SENDER);
+      var result = await wasm.call('balance_of', 0);
+      var decodedBalance = Balance.decode(new Buffer(wasm.readPointer(result)));
+      assert.equal(decodedBalance.amount.toNumber(), 80);
     });
 
     it('increases the receivers balance', async function() {
-      await wasm.call("transfer", [RECEIVER, 20]);
-      assert.equal(await wasm.call("get_balance", [RECEIVER]), 20);
+      storage = {};
+      wasm = new FakeBlockchain({
+        exports:{
+          // ...exports,
+          sender: () => {
+            wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
+            return 0;
+          },
+          read: (keyPtr) => {
+            var key = wasm.readPointer(keyPtr);
+            if(this.storage[key]) {
+              wasm.writePointer(this.storage[key]);
+            } else {
+              wasm.writePointer(new Uint32Array([0,0,0,0,0,0,0,0]));
+            }
+            return 0;
+          },
+          write: (keyPtr, valuePtr) => {
+            var key = wasm.readPointer(keyPtr);
+            var value = wasm.readPointer(valuePtr);
+
+            this.storage = this.storage || {};
+            this.storage[key] = value;
+          },
+          throw: (msgPointer) => {
+            var message = wasm.readString(msgPointer);
+            assert.equal(message, "insufficient funds");
+          }
+        },
+      });
+      code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
+      await wasm.load(code);
+      await wasm.call("_initialize")
+      var transferArgs = TransferArgs.encode(TransferArgs.create({
+        receiverAddress: hexToBytes("0000000000000000000000000000000000000002"),
+        amount: 20,
+      })).finish();
+      var t = TransferArgs.decode(transferArgs)
+
+      wasm.writePointer(transferArgs);
+      await wasm.call("transfer", 0);
+
+      wasm.writePointer(RECEIVER);
+      var result = await wasm.call('balance_of', 0);
+      var decodedBalance = Balance.decode(new Buffer(wasm.readPointer(result)));
+      assert.equal(decodedBalance.amount.toNumber(), 20);
     });
 
     it('throws if you try to send more tokens than you have', async function() {
+      storage = {};
       wasm = new FakeBlockchain({
-        exports: {
-          ...exports,
-          throw: (error) => {
-            assert.equal(error, ERROR_INSUFFICIENT_FUNDS);
+        exports:{
+          // ...exports,
+          sender: () => {
+            wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
+            return 0;
+          },
+          read: (keyPtr) => {
+            var key = wasm.readPointer(keyPtr);
+            if(this.storage[key]) {
+              wasm.writePointer(this.storage[key]);
+            } else {
+              wasm.writePointer(new Uint32Array([0,0,0,0,0,0,0,0]));
+            }
+            return 0;
+          },
+          write: (keyPtr, valuePtr) => {
+            var key = wasm.readPointer(keyPtr);
+            var value = wasm.readPointer(valuePtr);
+
+            this.storage = this.storage || {};
+            this.storage[key] = value;
+          },
+          throw: (msgPointer) => {
+            var message = wasm.readString(msgPointer);
+            assert.equal(message, "insufficient funds");
           }
-        }
+        },
       });
-      code = await readFile("./_build/token.wasm");
+      code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
       await wasm.load(code);
-      await await wasm.call("_initialize")
-      return await wasm.call("transfer", RECEIVER, 200);
+      await wasm.call("_initialize")
+      var transferArgs = TransferArgs.encode(TransferArgs.create({
+        receiverAddress: hexToBytes("0000000000000000000000000000000000000002"),
+        amount: 120,
+      })).finish();
+      var t = TransferArgs.decode(transferArgs)
+
+      wasm.writePointer(transferArgs);
+      await wasm.call("transfer", 0);
     });
   });
 });
