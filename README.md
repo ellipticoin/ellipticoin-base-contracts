@@ -3,7 +3,23 @@ Elipticoin Base Token Contract
 
 This is the base token contract for Elipticoin. The base token is used to pay
 Blacksmith nodes to execute transactions. The contract's storage is a mapping of
-addresses (public keys) to balances. Balances are stored as `uint64`s in thousandths of Elipticoins.
+addresses (public keys) to balances. Balances are stored as `uint64`s in
+thousandths of Elipticoins.
+
+The compile target is a [WASM
+file](https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md) that
+can be run in the Elipticoin Virtual Machine or any other WebAssembly
+interpreter.
+
+WebAssembly only supports integer and slice types so we need a way to pass in input parameters as binary data. Elipticoin contracts use [Protocol
+Buffers](https://developers.google.com/protocol-buffers/) for encoding input
+parameters. This gives us the added benefit of being able to define contract
+interfaces as [GRPC](https://grpc.io/) services!
+
+The base token contract is special in that it's deployed at the genesis block of
+Elipticoin. Otherwise, if the token contract didn't exist, there'd be no way to
+pay to deploy it!
+
 
 Running tests
 =============
