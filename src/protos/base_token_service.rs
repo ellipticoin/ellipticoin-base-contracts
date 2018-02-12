@@ -1,4 +1,4 @@
-use protos::base_token::{Balance, Address, TransferArgs};
+use protos::base_token::{Balance, Address, TransferArgs, InitializeArgs};
 use protobuf::{Message, parse_from_bytes};
 use ::base_token;
 use elipticoin_blockchain::*;
@@ -9,12 +9,14 @@ use protos::helpers::*;
 
 
 #[no_mangle]
-pub fn _initialize(){
+pub fn _initialize(ptr: *mut u32){
+    let in_bytes = from_pointer_with_length(ptr).to_vec_u8();
+    let initalize_args: InitializeArgs = parse_from_bytes(&in_bytes).unwrap();
     let elipticoin_blockchain = ElipitcoinBlockchain {};
     let base_token = base_token::BaseToken{
         blockchain: elipticoin_blockchain,
     };
-    base_token._initialize();
+    base_token._initialize(initalize_args.initial_supply);
 }
 
 #[no_mangle]

@@ -64,13 +64,13 @@ $root.elipticoin = (function() {
          * @function _Initialize
          * @memberof elipticoin.BaseToken
          * @instance
-         * @param {elipticoin.IEmpty} request Empty message or plain object
+         * @param {elipticoin.IInitializeArgs} request InitializeArgs message or plain object
          * @param {elipticoin.BaseToken._InitializeCallback} callback Node-style callback called with the error, if any, and Empty
          * @returns {undefined}
          * @variation 1
          */
         BaseToken.prototype._Initialize = function _Initialize(request, callback) {
-            return this.rpcCall(_Initialize, $root.elipticoin.Empty, $root.elipticoin.Empty, request, callback);
+            return this.rpcCall(_Initialize, $root.elipticoin.InitializeArgs, $root.elipticoin.Empty, request, callback);
         };
 
         /**
@@ -78,7 +78,7 @@ $root.elipticoin = (function() {
          * @function _Initialize
          * @memberof elipticoin.BaseToken
          * @instance
-         * @param {elipticoin.IEmpty} request Empty message or plain object
+         * @param {elipticoin.IInitializeArgs} request InitializeArgs message or plain object
          * @returns {Promise<elipticoin.Empty>} Promise
          * @variation 2
          */
@@ -150,6 +150,207 @@ $root.elipticoin = (function() {
          */
 
         return BaseToken;
+    })();
+
+    elipticoin.InitializeArgs = (function() {
+
+        /**
+         * Properties of an InitializeArgs.
+         * @memberof elipticoin
+         * @interface IInitializeArgs
+         * @property {number|Long|null} [initialSupply] InitializeArgs initialSupply
+         */
+
+        /**
+         * Constructs a new InitializeArgs.
+         * @memberof elipticoin
+         * @classdesc Represents an InitializeArgs.
+         * @implements IInitializeArgs
+         * @constructor
+         * @param {elipticoin.IInitializeArgs=} [properties] Properties to set
+         */
+        function InitializeArgs(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * InitializeArgs initialSupply.
+         * @member {number|Long} initialSupply
+         * @memberof elipticoin.InitializeArgs
+         * @instance
+         */
+        InitializeArgs.prototype.initialSupply = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+        /**
+         * Creates a new InitializeArgs instance using the specified properties.
+         * @function create
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {elipticoin.IInitializeArgs=} [properties] Properties to set
+         * @returns {elipticoin.InitializeArgs} InitializeArgs instance
+         */
+        InitializeArgs.create = function create(properties) {
+            return new InitializeArgs(properties);
+        };
+
+        /**
+         * Encodes the specified InitializeArgs message. Does not implicitly {@link elipticoin.InitializeArgs.verify|verify} messages.
+         * @function encode
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {elipticoin.IInitializeArgs} message InitializeArgs message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        InitializeArgs.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.initialSupply != null && message.hasOwnProperty("initialSupply"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.initialSupply);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified InitializeArgs message, length delimited. Does not implicitly {@link elipticoin.InitializeArgs.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {elipticoin.IInitializeArgs} message InitializeArgs message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        InitializeArgs.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an InitializeArgs message from the specified reader or buffer.
+         * @function decode
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {elipticoin.InitializeArgs} InitializeArgs
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        InitializeArgs.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.elipticoin.InitializeArgs();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.initialSupply = reader.uint64();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an InitializeArgs message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {elipticoin.InitializeArgs} InitializeArgs
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        InitializeArgs.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an InitializeArgs message.
+         * @function verify
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        InitializeArgs.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.initialSupply != null && message.hasOwnProperty("initialSupply"))
+                if (!$util.isInteger(message.initialSupply) && !(message.initialSupply && $util.isInteger(message.initialSupply.low) && $util.isInteger(message.initialSupply.high)))
+                    return "initialSupply: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates an InitializeArgs message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {elipticoin.InitializeArgs} InitializeArgs
+         */
+        InitializeArgs.fromObject = function fromObject(object) {
+            if (object instanceof $root.elipticoin.InitializeArgs)
+                return object;
+            var message = new $root.elipticoin.InitializeArgs();
+            if (object.initialSupply != null)
+                if ($util.Long)
+                    (message.initialSupply = $util.Long.fromValue(object.initialSupply)).unsigned = true;
+                else if (typeof object.initialSupply === "string")
+                    message.initialSupply = parseInt(object.initialSupply, 10);
+                else if (typeof object.initialSupply === "number")
+                    message.initialSupply = object.initialSupply;
+                else if (typeof object.initialSupply === "object")
+                    message.initialSupply = new $util.LongBits(object.initialSupply.low >>> 0, object.initialSupply.high >>> 0).toNumber(true);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an InitializeArgs message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof elipticoin.InitializeArgs
+         * @static
+         * @param {elipticoin.InitializeArgs} message InitializeArgs
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        InitializeArgs.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.initialSupply = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.initialSupply = options.longs === String ? "0" : 0;
+            if (message.initialSupply != null && message.hasOwnProperty("initialSupply"))
+                if (typeof message.initialSupply === "number")
+                    object.initialSupply = options.longs === String ? String(message.initialSupply) : message.initialSupply;
+                else
+                    object.initialSupply = options.longs === String ? $util.Long.prototype.toString.call(message.initialSupply) : options.longs === Number ? new $util.LongBits(message.initialSupply.low >>> 0, message.initialSupply.high >>> 0).toNumber(true) : message.initialSupply;
+            return object;
+        };
+
+        /**
+         * Converts this InitializeArgs to JSON.
+         * @function toJSON
+         * @memberof elipticoin.InitializeArgs
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        InitializeArgs.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return InitializeArgs;
     })();
 
     elipticoin.Empty = (function() {

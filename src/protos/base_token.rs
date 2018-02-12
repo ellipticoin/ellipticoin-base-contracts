@@ -22,6 +22,175 @@ use protobuf::Message as Message_imported_for_functions;
 use protobuf::ProtobufEnum as ProtobufEnum_imported_for_functions;
 
 #[derive(PartialEq,Clone,Default)]
+pub struct InitializeArgs {
+    // message fields
+    pub initial_supply: u64,
+    // special fields
+    unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::protobuf::CachedSize,
+}
+
+// see codegen.rs for the explanation why impl Sync explicitly
+unsafe impl ::std::marker::Sync for InitializeArgs {}
+
+impl InitializeArgs {
+    pub fn new() -> InitializeArgs {
+        ::std::default::Default::default()
+    }
+
+    pub fn default_instance() -> &'static InitializeArgs {
+        static mut instance: ::protobuf::lazy::Lazy<InitializeArgs> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const InitializeArgs,
+        };
+        unsafe {
+            instance.get(InitializeArgs::new)
+        }
+    }
+
+    // uint64 initial_supply = 1;
+
+    pub fn clear_initial_supply(&mut self) {
+        self.initial_supply = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_initial_supply(&mut self, v: u64) {
+        self.initial_supply = v;
+    }
+
+    pub fn get_initial_supply(&self) -> u64 {
+        self.initial_supply
+    }
+
+    fn get_initial_supply_for_reflect(&self) -> &u64 {
+        &self.initial_supply
+    }
+
+    fn mut_initial_supply_for_reflect(&mut self) -> &mut u64 {
+        &mut self.initial_supply
+    }
+}
+
+impl ::protobuf::Message for InitializeArgs {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint64()?;
+                    self.initial_supply = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.initial_supply != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.initial_supply, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if self.initial_supply != 0 {
+            os.write_uint64(1, self.initial_supply)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        ::protobuf::MessageStatic::descriptor_static(None::<Self>)
+    }
+}
+
+impl ::protobuf::MessageStatic for InitializeArgs {
+    fn new() -> InitializeArgs {
+        InitializeArgs::new()
+    }
+
+    fn descriptor_static(_: ::std::option::Option<InitializeArgs>) -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
+                    "initial_supply",
+                    InitializeArgs::get_initial_supply_for_reflect,
+                    InitializeArgs::mut_initial_supply_for_reflect,
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<InitializeArgs>(
+                    "InitializeArgs",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+}
+
+impl ::protobuf::Clear for InitializeArgs {
+    fn clear(&mut self) {
+        self.clear_initial_supply();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for InitializeArgs {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for InitializeArgs {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
 pub struct Empty {
     // special fields
     unknown_fields: ::protobuf::UnknownFields,
@@ -711,15 +880,16 @@ impl ::protobuf::reflect::ProtobufValue for Balance {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x10base_token.proto\x12\nelipticoin\"\x07\n\x05Empty\"\x1f\n\x07Addre\
-    ss\x12\x14\n\x05bytes\x18\x01\x20\x01(\x0cR\x05bytes\"Q\n\x0cTransferArg\
-    s\x12)\n\x10receiver_address\x18\x01\x20\x01(\x0cR\x0freceiverAddress\
-    \x12\x16\n\x06amount\x18\x02\x20\x01(\x04R\x06amount\"!\n\x07Balance\x12\
-    \x16\n\x06amount\x18\x01\x20\x01(\x04R\x06amount2\xb6\x01\n\tBaseToken\
-    \x125\n\x0b_Initialize\x12\x11.elipticoin.Empty\x1a\x11.elipticoin.Empty\
-    \"\0\x127\n\tBalanceOf\x12\x13.elipticoin.Address\x1a\x13.elipticoin.Bal\
-    ance\"\0\x129\n\x08Transfer\x12\x18.elipticoin.TransferArgs\x1a\x11.elip\
-    ticoin.Empty\"\0b\x06proto3\
+    \n\x10base_token.proto\x12\nelipticoin\"7\n\x0eInitializeArgs\x12%\n\x0e\
+    initial_supply\x18\x01\x20\x01(\x04R\rinitialSupply\"\x07\n\x05Empty\"\
+    \x1f\n\x07Address\x12\x14\n\x05bytes\x18\x01\x20\x01(\x0cR\x05bytes\"Q\n\
+    \x0cTransferArgs\x12)\n\x10receiver_address\x18\x01\x20\x01(\x0cR\x0frec\
+    eiverAddress\x12\x16\n\x06amount\x18\x02\x20\x01(\x04R\x06amount\"!\n\
+    \x07Balance\x12\x16\n\x06amount\x18\x01\x20\x01(\x04R\x06amount2\xbf\x01\
+    \n\tBaseToken\x12>\n\x0b_Initialize\x12\x1a.elipticoin.InitializeArgs\
+    \x1a\x11.elipticoin.Empty\"\0\x127\n\tBalanceOf\x12\x13.elipticoin.Addre\
+    ss\x1a\x13.elipticoin.Balance\"\0\x129\n\x08Transfer\x12\x18.elipticoin.\
+    TransferArgs\x1a\x11.elipticoin.Empty\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
