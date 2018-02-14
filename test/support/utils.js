@@ -19,7 +19,23 @@ function bytesToHex(bytes) {
     return hex.join("");
 }
 
+function toBytesInt32 (num) {
+    arr = new ArrayBuffer(4);
+    view = new DataView(arr);
+    view.setUint32(0, num);
+    return new Uint8Array(arr);
+}
+function fromBytesInt32 (buffer) {
+    arr = new ArrayBuffer(4);
+    view = new DataView(arr);
+    buffer.forEach((value, index) => view.setUint8(index, value));
+    return view.getUint32(0);
+}
+
+
 module.exports = {
+  fromBytesInt32,
+  toBytesInt32,
   hexToBytes,
   hexToAddress,
   bytesToHex,

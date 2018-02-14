@@ -9,4 +9,5 @@ mod test;
 mod base_token_test;
 mod elipticoin_blockchain;
 pub use protos::base_token_service::*;
+pub use protos::helpers::{alloc, dealloc};
 pub fn main() {}

@@ -16,3 +16,4 @@ cask = "0.*"
 [dependencies]
 bytes = { version = "0.4", features = ["serde"] }
 protobuf = "1.*"
+memalloc = "0.1.0"
