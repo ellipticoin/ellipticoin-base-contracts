@@ -23,7 +23,7 @@ pub unsafe trait PointerWithLength {
 unsafe impl PointerWithLength for Vec<u8> {
     fn to_pointer_with_length(&self) -> *const u8 {
         let value = self.clone();
-        let length_slice: [u8; LENGTH_BYTE_COUNT] = unsafe{ transmute(value.len().to_be()) };
+        let length_slice: [u8; LENGTH_BYTE_COUNT] = unsafe{ transmute(value.len() as u32) };
         let value_and_length = [&length_slice[..], &value[..]].concat();;
         let value_and_length_ptr = value_and_length.as_ptr();
         mem::forget(value_and_length);

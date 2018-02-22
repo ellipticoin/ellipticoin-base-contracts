@@ -49,7 +49,7 @@ impl BlockChain for ElipitcoinBlockchain {
 
     fn throw(&mut self, message: &str) {
         let value = CString::new(message).unwrap();
-        let length_slice: [u8; LENGTH_BYTE_COUNT] = unsafe{ transmute(message.len().to_be()) };
+        let length_slice: [u8; LENGTH_BYTE_COUNT] = unsafe{ transmute(message.len() as u32) };
         let value_and_length = [&length_slice[..], value.as_bytes()].concat();;
         let value_and_length_ptr = value_and_length.as_ptr();
         mem::forget(value_and_length);
