@@ -1,3 +1,6 @@
+#[cfg(not(test))]
+use alloc::vec::Vec;
+
 use blockchain::*;
 pub struct BaseToken<T: BlockChain>  {
     pub blockchain: T

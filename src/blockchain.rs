@@ -1,4 +1,10 @@
+#[cfg(not(test))]
+use alloc::vec::Vec;
+#[cfg(test)]
 use std::mem::transmute;
+#[cfg(not(test))]
+use core::mem::transmute;
+
 pub trait Valuable {}
 
 impl Valuable {

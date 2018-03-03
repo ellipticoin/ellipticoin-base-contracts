@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Mason Fischer <mason@kissr.co>"]
 
 [build-dependencies]
-protoc-rust = "1.4"
 cask = "0.*"
 
 [lib]
@@ -12,8 +11,12 @@ crate_type = ["cdylib"]
 
 [dev-dependencies]
 cask = "0.*"
+serde_json = "1.0"
+serde_cbor = "0.8.2"
+serde-transcode = "1.0.0"
+
 
 [dependencies]
-bytes = { version = "0.4", features = ["serde"] }
-protobuf = "1.*"
-memalloc = "0.1.0"
+cbor-no-std = { path = '../rust-cbor-no-std', features = ["no_std"] }
+wee_alloc = { git = 'https://github.com/fitzgen/wee_alloc' }
+rlibc = "1.0"
