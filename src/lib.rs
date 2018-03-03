@@ -1,9 +1,9 @@
 #![feature(
-    global_allocator,
     alloc,
-    core_intrinsics,
-    lang_items,
     allocator_api,
+    core_intrinsics,
+    global_allocator,
+    lang_items,
     pointer_methods,
     rustc_private,
     )]

@@ -87,15 +87,6 @@ unsafe impl ToWASMBytes for Vec<u8> {
     }
 }
 
-macro_rules! deref_cbor {
-    ($pointer_name:ident) => (
-        unsafe {
-            let vec: Vec<u8> = $pointer_name.from_wasm_bytes();
-            from_bytes(vec)
-        }
-    )
-}
-
 pub struct FakeBlockChain {
 }
 
@@ -113,13 +104,24 @@ pub struct BaseToken<T: BlockChain>  {
     pub blockchain: T
 }
 
-impl<B> BaseToken<B> where B: BlockChain {
-    pub fn balance_of(&self, params: Pointer) -> Pointer {
-        if let Value::Bytes(address) = deref_cbor!(params) {
-            self.blockchain.read_u32().to_wasm_bytes()
+pub trait Params {
+    fn at(&mut self, n: usize) -> Value;
+}
+
+impl Params for Pointer {
+    fn at(&mut self, n: usize) -> Value {
+        if let Value::Array(array) = from_bytes(self.from_wasm_bytes()) {
+            array.iter().nth(n).expect("Parameter error").clone()
         } else {
-            vec![].to_wasm_bytes()
+            unreachable!()
         }
+    }
+}
+
+impl<B> BaseToken<B> where B: BlockChain {
+    pub fn balance_of(&self, mut params: Pointer) -> Pointer {
+        let address = params.at(0);
+        self.blockchain.read_u32().to_wasm_bytes()
     }
 }
 
@@ -157,7 +159,7 @@ mod tests {
 
     #[test]
     fn balance_of() {
-        let bytes: Vec<u8> = "43010203".from_hex().unwrap();
+        let bytes: Vec<u8> = "8143010203".from_hex().unwrap();
         assert_eq!(vec![19], call(bytes.to_wasm_bytes()).from_wasm_bytes());
     }
 }
