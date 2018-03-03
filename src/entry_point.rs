@@ -1,6 +1,4 @@
 #![cfg_attr(all(feature = "no_std", not(test)), no_std)]
-#![feature(underscore_lifetimes, core_slice_ext)]
-#![feature(global_allocator, alloc, core_intrinsics, lang_items, allocator_api)]
 extern crate rlibc;
 extern crate wee_alloc;
 use alloc::vec::Vec;
@@ -18,25 +16,8 @@ use std::slice;
 use std::str;
 
 #[cfg(test)]
-use serde_json;
-#[cfg(test)]
-use serde_cbor;
-#[cfg(test)]
-use serde_transcode;
-#[cfg(test)]
-use std::io;
-#[cfg(test)]
 extern crate rustc_serialize as serialize;
-#[cfg(test)]
-use self::serialize::hex::FromHex;
-
-
-#[cfg(test)]
-use self::serde_cbor::{Value as CborValue};
-
-
-extern crate cbor_no_std;
-use self::cbor_no_std::{from_bytes, Value};
+use cbor_no_std::{from_bytes, Value};
 
 pub const LENGTH_BYTE_COUNT: usize = 4;
 
@@ -108,9 +89,9 @@ pub trait Params {
     fn at(&mut self, n: usize) -> Value;
 }
 
-impl Params for Pointer {
+impl Params for Value {
     fn at(&mut self, n: usize) -> Value {
-        if let Value::Array(array) = from_bytes(self.from_wasm_bytes()) {
+        if let Value::Array(ref array) = *self {
             array.iter().nth(n).expect("Parameter error").clone()
         } else {
             unreachable!()
@@ -119,24 +100,22 @@ impl Params for Pointer {
 }
 
 impl<B> BaseToken<B> where B: BlockChain {
-    pub fn balance_of(&self, mut params: Pointer) -> Pointer {
-        let address = params.at(0);
+    pub fn balance_of(&self, mut params: Value) -> Pointer {
+        let _address = params.at(0);
         self.blockchain.read_u32().to_wasm_bytes()
     }
 }
 
 pub trait WASMRpc {
-    fn call(&self, method: &str, params: Pointer) -> Pointer;
+    fn call(&self, method: &str, params: Value) -> Pointer;
 }
 
 // TODO Generate this automatically with a #[derive(WASMRpc)]
 impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
-    fn call(&self, method: &str, params: Pointer) -> Pointer {
-        unsafe{
-            match method {
-                "balance_of" => self.balance_of(params),
-                _ => vec![].to_wasm_bytes(),
-            }
+    fn call(&self, method: &str, params: Value) -> Pointer {
+        match method {
+            "balance_of" => self.balance_of(params),
+            _ => vec![].to_wasm_bytes(),
         }
     }
 }
@@ -144,11 +123,14 @@ impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
 // // TODO Generate this automatically with a macro like
 // // wasm_expose!(BaseToken, FakeBlockChain)
 #[no_mangle]
-pub fn call(payload: Pointer) -> Pointer {
+pub fn call(payload_ptr: Pointer) -> Pointer {
     let fake_blockchain =  FakeBlockChain {};
-    let mut base_token =  BaseToken { blockchain: fake_blockchain };
-    // TODO get method name from payload
-    base_token.call(&"balance_of", payload)
+    let base_token =  BaseToken { blockchain: fake_blockchain };
+    let tmp_payload = from_bytes(payload_ptr.from_wasm_bytes());
+    let payload = tmp_payload.as_map().unwrap();
+    let ref method = payload.get(&Value::String("method".into())).unwrap().as_string().unwrap();
+    let params = payload.get(&Value::String("params".into())).unwrap().clone();
+    base_token.call(method, params)
 }
 
 
@@ -159,7 +141,8 @@ mod tests {
 
     #[test]
     fn balance_of() {
-        let bytes: Vec<u8> = "8143010203".from_hex().unwrap();
+        // {method:"balance_of", params: [new Buffer([1,2,3])]}
+        let bytes: Vec<u8> = "a2666d6574686f646a62616c616e63655f6f6666706172616d738143010203".from_hex().unwrap();
         assert_eq!(vec![19], call(bytes.to_wasm_bytes()).from_wasm_bytes());
     }
 }

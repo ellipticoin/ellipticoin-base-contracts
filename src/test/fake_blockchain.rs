@@ -9,7 +9,6 @@ use self::cask::{CaskOptions, SyncStrategy, Cask};
 
 pub const SENDER: [u8; 20] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ];
 pub const ALICE: [u8; 20] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 ];
-pub const BOB: [u8; 20] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ];
 pub struct FakeBlockChain {
     pub db: Cask,
     pub sender: Vec<u8>,
