@@ -17,7 +17,7 @@ use std::str;
 
 #[cfg(test)]
 extern crate rustc_serialize as serialize;
-use cbor_no_std::{from_bytes, Value};
+use cbor_no_std::{from_bytes, to_bytes, Value};
 
 pub const LENGTH_BYTE_COUNT: usize = 4;
 
@@ -72,13 +72,13 @@ pub struct FakeBlockChain {
 }
 
 impl BlockChain for FakeBlockChain {
-    fn read_u32(&self) -> Vec<u8> {
-        vec![19]
+    fn read_u32(&self) -> u32 {
+        19
     }
 }
 
 pub trait BlockChain {
-    fn read_u32(&self) -> Vec<u8>;
+    fn read_u32(&self) -> u32;
 }
 
 pub struct BaseToken<T: BlockChain>  {
@@ -100,9 +100,14 @@ impl Params for Value {
 }
 
 impl<B> BaseToken<B> where B: BlockChain {
-    pub fn balance_of(&self, mut params: Value) -> Pointer {
+    pub fn constructor(&self, mut params: Value) -> Result<(), &'static str> {
+        let _amount = params.at(0);
+        Ok(())
+    }
+
+    pub fn balance_of(&self, mut params: Value) -> Result<Option<Value>, &'static str> {
         let _address = params.at(0);
-        self.blockchain.read_u32().to_wasm_bytes()
+        Ok(Some(Value::Int(self.blockchain.read_u32())))
     }
 }
 
@@ -113,24 +118,32 @@ pub trait WASMRpc {
 // TODO Generate this automatically with a #[derive(WASMRpc)]
 impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
     fn call(&self, method: &str, params: Value) -> Pointer {
-        match method {
+        let result = match method {
             "balance_of" => self.balance_of(params),
+            "constructor" => {
+                self.constructor(params);
+                Ok(None)
+            },
+            _ => Ok(None),
+        };
+
+        match result {
+            Ok(Some(value)) => to_bytes(value).to_wasm_bytes(),
             _ => vec![].to_wasm_bytes(),
         }
     }
 }
 
-// // TODO Generate this automatically with a macro like
-// // wasm_expose!(BaseToken, FakeBlockChain)
+// TODO Generate this automatically with a macro like
+// wasm_rpc_expose!(BaseToken { blockchain: FakeBlockChain {} })
 #[no_mangle]
 pub fn call(payload_ptr: Pointer) -> Pointer {
-    let fake_blockchain =  FakeBlockChain {};
-    let base_token =  BaseToken { blockchain: fake_blockchain };
+    let rpc =  BaseToken { blockchain: FakeBlockChain {} };
     let tmp_payload = from_bytes(payload_ptr.from_wasm_bytes());
     let payload = tmp_payload.as_map().unwrap();
-    let ref method = payload.get(&Value::String("method".into())).unwrap().as_string().unwrap();
-    let params = payload.get(&Value::String("params".into())).unwrap().clone();
-    base_token.call(method, params)
+    let ref method = payload.get("method".into()).unwrap().as_string().unwrap();
+    let params = payload.get("params".into()).unwrap().clone();
+    rpc.call(method, params)
 }
 
 
