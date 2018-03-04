@@ -1,6 +1,7 @@
 #![cfg_attr(all(feature = "no_std", not(test)), no_std)]
 extern crate rlibc;
 extern crate wee_alloc;
+use alloc::btree_map::BTreeMap;
 use alloc::vec::Vec;
 #[cfg(not(test))]
 use core::mem;
@@ -15,7 +16,10 @@ use std::slice;
 #[cfg(test)]
 use std::str;
 use blockchain::BlockChain;
+#[cfg(test)]
 use test::fake_blockchain::FakeBlockChain;
+#[cfg(not(test))]
+use elipticoin_blockchain::ElipitcoinBlockchain;
 use base_token::{BaseToken};
 
 #[cfg(test)]
@@ -89,11 +93,11 @@ unsafe impl ToWASMBytes for Vec<u8> {
 // }
 
 pub trait Params {
-    fn at(self, n: usize) -> Value;
+    fn at(&self, n: usize) -> Value;
 }
 
 impl Params for Value {
-    fn at(self, n: usize) -> Value {
+    fn at(&self, n: usize) -> Value {
         self.as_array().unwrap().to_vec().iter().nth(n).unwrap().clone()
     }
 }
@@ -102,22 +106,32 @@ pub trait WASMRpc {
     fn call(&self, method: &str, params: Value) -> Pointer;
 }
 
+fn error(code: u32) -> Value {
+    let mut error_code = BTreeMap::new();
+    error_code.insert("code".into(), Value::Int(code));
+
+    let mut error_map = BTreeMap::new();
+    error_map.insert("error".into(), Value::Map(error_code));
+    Value::Map(error_map)
+}
+
 // TODO Generate this automatically with a #[derive(WASMRpc)]
 impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
     fn call(&self, method: &str, params: Value) -> Pointer {
         let result = match method {
             "balance_of" => self.balance_of(params.at(0).as_bytes().unwrap().to_vec()),
-            "constructor" => {
-                self.constructor(params.at(0).as_int().unwrap() as u64).unwrap();
-                Ok(Value::Null)
-            },
+            "constructor" => self.constructor(params.at(0).as_int().unwrap() as u64),
+            "transfer" => self.transfer(params.at(0).as_bytes().unwrap().to_vec(), params.at(1).as_int().unwrap() as u64),
             _ => Ok(Value::Null),
         };
 
         match result {
             Ok(Value::Null) => vec![].to_wasm_bytes(),
             Ok(value) => to_bytes(value).to_wasm_bytes(),
-            Err(_) => vec![].to_wasm_bytes(),
+            Err(_) =>   {
+                to_bytes(error(1)).to_wasm_bytes()
+                // vec![].to_wasm_bytes()
+            }
         }
     }
 }
@@ -127,9 +141,11 @@ impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
 #[no_mangle]
 pub fn call(payload_ptr: Pointer) -> Pointer {
     let rpc =  BaseToken {
-        blockchain: FakeBlockChain {..Default::default()}
+        // blockchain: FakeBlockChain {..Default::default()}
+        blockchain: ElipitcoinBlockchain {}
     };
-    let tmp_payload = from_bytes(payload_ptr.from_wasm_bytes());
+    let bytes = payload_ptr.from_wasm_bytes();
+    let tmp_payload = from_bytes(bytes);
     let payload = tmp_payload.as_map().unwrap();
     let ref method = payload.get("method".into()).unwrap().as_string().unwrap();
     let params = payload.get("params".into()).unwrap().clone();
@@ -142,10 +158,9 @@ mod tests {
     use super::*;
     use entry_point::serialize::hex::FromHex;
 
-    #[test]
+    #[test] #[ignore]
     fn balance_of() {
-        // {method:"balance_of", params: [new Buffer([1,2,3])]}
-        let bytes: Vec<u8> = "a2666d6574686f646a62616c616e63655f6f6666706172616d738143010203".from_hex().unwrap();
+        let bytes: Vec<u8> = "a2666d6574686f64687472616e7366657266706172616d73825400000000000000000000000000000000000000021878".from_hex().unwrap();
         assert_eq!(vec![0], call(bytes.to_wasm_bytes()).from_wasm_bytes());
     }
 }

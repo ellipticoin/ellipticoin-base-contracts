@@ -19,6 +19,9 @@ extern crate cbor_no_std;
 
 mod blockchain;
 mod base_token;
+
+#[cfg(not(test))]
+mod elipticoin_blockchain;
 #[cfg(test)]
 mod test;
 #[cfg(test)]

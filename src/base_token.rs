@@ -17,14 +17,14 @@ impl <B> BaseToken<B> where B: BlockChain {
         Ok(Value::Int(self.read(&address) as u32))
     }
 
-    pub fn transfer(&mut self, receiver_address: Vec<u8>, amount: u64)  -> Result<(), &'static str> {
+    pub fn transfer(&self, receiver_address: Vec<u8>, amount: u64)  -> Result<Value, &'static str> {
         let sender_balance = self.read(&self.sender());
         let receiver_balance = self.read(&receiver_address);
 
         if sender_balance > amount {
             self.write(self.sender(), sender_balance - amount);
             self.write(receiver_address, receiver_balance + amount);
-            Ok(())
+            Ok(Value::Null)
         } else {
             Err("insufficient funds")
         }
