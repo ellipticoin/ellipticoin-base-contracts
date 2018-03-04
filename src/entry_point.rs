@@ -14,6 +14,9 @@ use std::mem;
 use std::slice;
 #[cfg(test)]
 use std::str;
+use blockchain::BlockChain;
+use test::fake_blockchain::FakeBlockChain;
+use base_token::{BaseToken};
 
 #[cfg(test)]
 extern crate rustc_serialize as serialize;
@@ -68,46 +71,30 @@ unsafe impl ToWASMBytes for Vec<u8> {
     }
 }
 
-pub struct FakeBlockChain {
-}
-
-impl BlockChain for FakeBlockChain {
-    fn read_u32(&self) -> u32 {
-        19
-    }
-}
-
-pub trait BlockChain {
-    fn read_u32(&self) -> u32;
-}
-
-pub struct BaseToken<T: BlockChain>  {
-    pub blockchain: T
-}
+// pub struct FakeBlockChain {
+// }
+//
+// impl BlockChain for FakeBlockChain {
+//     fn read_u32(&self) -> u32 {
+//         19
+//     }
+// }
+//
+// pub trait BlockChain {
+//     fn read_u32(&self) -> u32;
+// }
+//
+// pub struct BaseToken<T: BlockChain>  {
+//     pub blockchain: T
+// }
 
 pub trait Params {
-    fn at(&mut self, n: usize) -> Value;
+    fn at(self, n: usize) -> Value;
 }
 
 impl Params for Value {
-    fn at(&mut self, n: usize) -> Value {
-        if let Value::Array(ref array) = *self {
-            array.iter().nth(n).expect("Parameter error").clone()
-        } else {
-            unreachable!()
-        }
-    }
-}
-
-impl<B> BaseToken<B> where B: BlockChain {
-    pub fn constructor(&self, mut params: Value) -> Result<(), &'static str> {
-        let _amount = params.at(0);
-        Ok(())
-    }
-
-    pub fn balance_of(&self, mut params: Value) -> Result<Option<Value>, &'static str> {
-        let _address = params.at(0);
-        Ok(Some(Value::Int(self.blockchain.read_u32())))
+    fn at(self, n: usize) -> Value {
+        self.as_array().unwrap().to_vec().iter().nth(n).unwrap().clone()
     }
 }
 
@@ -119,26 +106,29 @@ pub trait WASMRpc {
 impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
     fn call(&self, method: &str, params: Value) -> Pointer {
         let result = match method {
-            "balance_of" => self.balance_of(params),
+            "balance_of" => self.balance_of(params.at(0).as_bytes().unwrap().to_vec()),
             "constructor" => {
-                self.constructor(params);
-                Ok(None)
+                self.constructor(params.at(0).as_int().unwrap() as u64).unwrap();
+                Ok(Value::Null)
             },
-            _ => Ok(None),
+            _ => Ok(Value::Null),
         };
 
         match result {
-            Ok(Some(value)) => to_bytes(value).to_wasm_bytes(),
-            _ => vec![].to_wasm_bytes(),
+            Ok(Value::Null) => vec![].to_wasm_bytes(),
+            Ok(value) => to_bytes(value).to_wasm_bytes(),
+            Err(_) => vec![].to_wasm_bytes(),
         }
     }
 }
 
 // TODO Generate this automatically with a macro like
-// wasm_rpc_expose!(BaseToken { blockchain: FakeBlockChain {} })
+// wasm_rpc_expose!(BaseToken { blockchain: ... })
 #[no_mangle]
 pub fn call(payload_ptr: Pointer) -> Pointer {
-    let rpc =  BaseToken { blockchain: FakeBlockChain {} };
+    let rpc =  BaseToken {
+        blockchain: FakeBlockChain {..Default::default()}
+    };
     let tmp_payload = from_bytes(payload_ptr.from_wasm_bytes());
     let payload = tmp_payload.as_map().unwrap();
     let ref method = payload.get("method".into()).unwrap().as_string().unwrap();
@@ -156,6 +146,6 @@ mod tests {
     fn balance_of() {
         // {method:"balance_of", params: [new Buffer([1,2,3])]}
         let bytes: Vec<u8> = "a2666d6574686f646a62616c616e63655f6f6666706172616d738143010203".from_hex().unwrap();
-        assert_eq!(vec![19], call(bytes.to_wasm_bytes()).from_wasm_bytes());
+        assert_eq!(vec![0], call(bytes.to_wasm_bytes()).from_wasm_bytes());
     }
 }

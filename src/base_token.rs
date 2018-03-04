@@ -8,13 +8,13 @@ pub struct BaseToken<T: BlockChain>  {
 }
 
 impl <B> BaseToken<B> where B: BlockChain {
-    pub fn constructor(&self, initial_supply: u64) -> Result<(), &'static str> {
+    pub fn constructor(&self, initial_supply: u64) -> Result<Value, &'static str> {
         self.write(self.blockchain.sender(), initial_supply);
-        Ok(())
+        Ok(Value::Null)
     }
 
-    pub fn balance_of(&self, address: Vec<u8>) -> Result<u64, &'static      str> {
-        Ok(self.read(&address))
+    pub fn balance_of(&self, address: Vec<u8>) -> Result<Value, &'static str> {
+        Ok(Value::Int(self.read(&address) as u32))
     }
 
     pub fn transfer(&mut self, receiver_address: Vec<u8>, amount: u64)  -> Result<(), &'static str> {

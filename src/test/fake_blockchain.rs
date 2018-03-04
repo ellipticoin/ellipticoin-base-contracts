@@ -12,15 +12,8 @@ pub const ALICE: [u8; 20] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 pub struct FakeBlockChain {
     pub db: Cask,
     pub sender: Vec<u8>,
-    pub throw_callback: Box<FnMut(&str)>,
 }
 
-impl FakeBlockChain {
-    pub fn set_throw_callback<CB: 'static + FnMut(&str)>(&mut self, c: CB) {
-        self.throw_callback = Box::new(c);
-    }
-
-}
 impl BlockChain for FakeBlockChain {
     fn read_u32(&self, key: Vec<u8>) -> u32 {
         match self.db.get(key).unwrap() {
@@ -46,10 +39,6 @@ impl BlockChain for FakeBlockChain {
             .put(key, Valuable::from_u64(value))
             .expect("could not put value");
     }
-
-    fn throw(&mut self, message: &str) {
-        (self.throw_callback)(message);
-    }
 }
 
 impl Default for FakeBlockChain {
@@ -65,7 +54,6 @@ impl Default for FakeBlockChain {
         FakeBlockChain {
             db: cask,
             sender: SENDER.to_vec(),
-            throw_callback: Box::new(|msg: &str| println!("Error: {}", msg)),
         }
     }
 }
