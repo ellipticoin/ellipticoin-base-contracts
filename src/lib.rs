@@ -27,6 +27,7 @@ mod test;
 #[cfg(test)]
 mod base_token_test;
 pub mod memory;
+pub mod error;
 pub mod entry_point;
 pub fn main() {}
 #[cfg(not(test))]

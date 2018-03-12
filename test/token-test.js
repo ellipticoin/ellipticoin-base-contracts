@@ -60,53 +60,32 @@ describe('token', function() {
     });
     code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
     await wasm.load(code);
-    var payloadPointer = wasm.writePointer(cbor.encode({
-      method: "constructor",
-      params: [100],
-    }));
-
-    await wasm.call("call", payloadPointer);
+    await wasm.call('constructor', 100);
   });
 
   describe('constructor', function() {
     it('should initalize the sender with 100 tokens', async function() {
-      var payloadPointer = wasm.writePointer(cbor.encode({
-        method: "balance_of",
-        params: [SENDER],
-      }));
-      var result = await wasm.call('call', payloadPointer);
+      var result = await wasm.call('balance_of', SENDER);
 
-      assert.equal(cbor.decode(new Buffer(wasm.readPointer(result))), 100);
+      assert.equal(result, 100);
     });
   });
 
   describe('balance_of', function() {
     it('should return your balance', async function() {
-      var payloadPointer = wasm.writePointer(cbor.encode({
-        method: "balance_of",
-        params: [SENDER],
-      }));
-      var result = await wasm.call('call', payloadPointer);
+      var result = await wasm.call('balance_of', SENDER);
 
-      assert.equal(cbor.decode(new Buffer(wasm.readPointer(result))), 100);
+      assert.equal(result, 100);
     });
   });
 
   describe('transfer', function() {
     it('decreases the senders balance', async function() {
-      var payloadPointer = wasm.writePointer(cbor.encode({
-        method: "transfer",
-        params: [RECEIVER, 20],
-      }));
-      result = await wasm.call('call', payloadPointer);
+      await wasm.call('transfer', RECEIVER, 20);
 
-      payloadPointer = wasm.writePointer(cbor.encode({
-        method: "balance_of",
-        params: [SENDER],
-      }));
-      var result = await wasm.call("call", payloadPointer);
+      var result = await wasm.call('balance_of', SENDER);
 
-      assert.equal(cbor.decode(new Buffer(wasm.readPointer(result))), 80);
+      assert.equal(result, 80);
     });
 
     it('increases the receivers balance', async function() {
@@ -136,37 +115,19 @@ describe('token', function() {
       });
       code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
       await wasm.load(code);
-      var payloadPointer = wasm.writePointer(cbor.encode({
-        method: "constructor",
-        params: [100],
-      }));
-      await wasm.call("call", payloadPointer);
-      var payloadPointer = wasm.writePointer(cbor.encode({
-        method: "transfer",
-        params: [RECEIVER, 20],
-      }));
-      result = await wasm.call('call', payloadPointer);
+      await wasm.call('constructor', 100);
+      await wasm.call('transfer', RECEIVER, 20);
 
-      payloadPointer = wasm.writePointer(cbor.encode({
-        method: "balance_of",
-        params: [RECEIVER],
-      }));
-      var result = await wasm.call("call", payloadPointer);
+      var result = await wasm.call('balance_of', RECEIVER);
 
-      assert.equal(cbor.decode(new Buffer(wasm.readPointer(result))), 20);
+      assert.equal(result, 20);
     });
 
     it('returns an error if you try to send more tokens than you have', async function() {
-      var payloadPointer = wasm.writePointer(cbor.encode({
-        method: "transfer",
-        params: [RECEIVER, 120],
-      }));
-      var result = await wasm.call('call', payloadPointer);
-      assert(_.isEqual(cbor.decode(new Buffer(wasm.readPointer(result))), {
-        error: {
-          code: ERROR_CODES.INSUFFIENT_FUNDS,
-        }
-      }));
+      assert.throws(
+        () => wasm.call("transfer", RECEIVER, 120),
+        /insufficient funds/,
+      );
     });
   });
 });

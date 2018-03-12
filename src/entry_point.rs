@@ -3,6 +3,12 @@ extern crate rlibc;
 extern crate wee_alloc;
 use alloc::btree_map::BTreeMap;
 use alloc::vec::Vec;
+use alloc::string::ToString;
+
+#[cfg(test)]
+use std::mem::transmute;
+#[cfg(not(test))]
+use core::mem::transmute;
 #[cfg(not(test))]
 use core::mem;
 #[cfg(not(test))]
@@ -21,6 +27,7 @@ use test::fake_blockchain::FakeBlockChain;
 #[cfg(not(test))]
 use elipticoin_blockchain::ElipitcoinBlockchain;
 use base_token::{BaseToken};
+use error::{self, Error};
 
 #[cfg(test)]
 extern crate rustc_serialize as serialize;
@@ -134,6 +141,51 @@ impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
             }
         }
     }
+}
+
+fn to_return_value(result: Result<Value, Error>) -> Pointer {
+    let error_code = match result {
+        Err(error) => error.code,
+        _ => 0,
+    };
+
+    let mut return_value = match result {
+        Ok(Value::Null) => vec![],
+        Ok(value) => to_bytes(value),
+        Err(error) => to_bytes(Value::String(error.message.into())),
+    };
+
+    let mut error_code_bytes = unsafe {
+        transmute::<u32 ,[u8; 4]>(error_code).to_vec()
+    };
+
+    error_code_bytes.append(&mut return_value);
+    error_code_bytes.to_wasm_bytes()
+}
+
+// TODO Generate these functions automatically with a [Procedural Macro](https://doc.rust-lang.org/book/first-edition/procedural-macros.html)
+
+#[no_mangle]
+pub fn constructor(balance: u32) -> Pointer {
+    let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
+    let result = rpc.constructor(balance as u64);
+    to_return_value(result)
+}
+
+#[no_mangle]
+pub fn balance_of(address_ptr: Pointer) -> Pointer {
+    let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
+    let address = from_bytes(address_ptr.from_wasm_bytes());
+    let result = rpc.balance_of(address.as_bytes().unwrap().to_vec());
+    to_return_value(result)
+}
+
+#[no_mangle]
+pub fn transfer(receiver_address_ptr: Pointer, amount: u32) -> Pointer {
+    let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
+    let receiver_address = from_bytes(receiver_address_ptr.from_wasm_bytes());
+    let result = rpc.transfer(receiver_address.as_bytes().unwrap().to_vec(), amount as u64);
+    to_return_value(result)
 }
 
 // TODO Generate this automatically with a macro like

@@ -1,6 +1,7 @@
 #[cfg(not(test))]
 use alloc::vec::Vec;
 use cbor_no_std::{Value};
+use error::{self, Error};
 
 use blockchain::*;
 pub struct BaseToken<T: BlockChain>  {
@@ -8,16 +9,16 @@ pub struct BaseToken<T: BlockChain>  {
 }
 
 impl <B> BaseToken<B> where B: BlockChain {
-    pub fn constructor(&self, initial_supply: u64) -> Result<Value, &'static str> {
+    pub fn constructor(&self, initial_supply: u64) -> Result<Value, Error> {
         self.write(self.blockchain.sender(), initial_supply);
         Ok(Value::Null)
     }
 
-    pub fn balance_of(&self, address: Vec<u8>) -> Result<Value, &'static str> {
+    pub fn balance_of(&self, address: Vec<u8>) -> Result<Value, Error> {
         Ok(Value::Int(self.read(&address) as u32))
     }
 
-    pub fn transfer(&self, receiver_address: Vec<u8>, amount: u64)  -> Result<Value, &'static str> {
+    pub fn transfer(&self, receiver_address: Vec<u8>, amount: u64)  -> Result<Value, Error> {
         let sender_balance = self.read(&self.sender());
         let receiver_balance = self.read(&receiver_address);
 
@@ -26,7 +27,7 @@ impl <B> BaseToken<B> where B: BlockChain {
             self.write(receiver_address, receiver_balance + amount);
             Ok(Value::Null)
         } else {
-            Err("insufficient funds")
+            Err(error::INSUFFIENT_FUNDS)
         }
     }
 
