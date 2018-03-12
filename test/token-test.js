@@ -27,7 +27,7 @@ describe('token', function() {
   const exports = {
     rust_begin_unwind: () => null,
     sender: () => {
-      return wasm.writePointer(new Buffer(hexToBytes("0000000000000000000000000000000000000001")));
+      return wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
     },
     read: (keyPtr) => {
       this.storage = this.storage || {};
@@ -64,6 +64,7 @@ describe('token', function() {
       method: "constructor",
       params: [100],
     }));
+
     await wasm.call("call", payloadPointer);
   });
 
