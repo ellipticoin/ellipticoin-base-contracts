@@ -27,6 +27,7 @@ use test::fake_blockchain::FakeBlockChain;
 #[cfg(not(test))]
 use elipticoin_blockchain::ElipitcoinBlockchain;
 use base_token::{BaseToken};
+use human_readable_name_registration::{HumanReadableNameRegistration};
 use error::{self, Error};
 
 #[cfg(test)]
@@ -185,6 +186,21 @@ pub fn transfer(receiver_address_ptr: Pointer, amount: u32) -> Pointer {
     let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
     let receiver_address = from_bytes(receiver_address_ptr.from_wasm_bytes());
     let result = rpc.transfer(receiver_address.as_bytes().unwrap().to_vec(), amount as u64);
+    to_return_value(result)
+}
+
+#[no_mangle]
+pub fn register() -> Pointer {
+    let rpc =  HumanReadableNameRegistration { blockchain: ElipitcoinBlockchain {} };
+    let result = rpc.register();
+    to_return_value(result)
+}
+
+#[no_mangle]
+pub fn lookup(prefix_ptr: Pointer) -> Pointer {
+    let rpc =  HumanReadableNameRegistration { blockchain: ElipitcoinBlockchain {} };
+    let prefix = from_bytes(prefix_ptr.from_wasm_bytes());
+    let result = rpc.lookup(prefix.as_bytes().unwrap().to_vec());
     to_return_value(result)
 }
 

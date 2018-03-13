@@ -15,6 +15,12 @@ extern {
 pub struct ElipitcoinBlockchain {}
 
 impl BlockChain for ElipitcoinBlockchain {
+    fn read(&self, key: Vec<u8>) -> Vec<u8> {
+      unsafe {
+        read(key.to_wasm_bytes()).from_wasm_bytes()
+      }
+    }
+
     fn read_u32(&self, key: Vec<u8>) -> u32 {
       unsafe {
         read(key.to_wasm_bytes()).from_wasm_bytes().value()
@@ -31,6 +37,14 @@ impl BlockChain for ElipitcoinBlockchain {
         unsafe{sender().from_wasm_bytes()}
     }
 
+    fn write(&self, key: Vec<u8>, value: Vec<u8>) {
+        unsafe {
+            write(
+                key.to_vec().to_wasm_bytes(),
+                value.to_vec().to_wasm_bytes(),
+            );
+        }
+    }
 
     fn write_u64(&self, key: Vec<u8>, value: u64) {
         let value_bytes: Vec<u8> = Valuable::from_u64(value);
