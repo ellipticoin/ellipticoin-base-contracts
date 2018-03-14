@@ -3,7 +3,6 @@ extern crate rlibc;
 extern crate wee_alloc;
 use alloc::btree_map::BTreeMap;
 use alloc::vec::Vec;
-use alloc::string::ToString;
 
 #[cfg(test)]
 use std::mem::transmute;
@@ -28,7 +27,7 @@ use test::fake_blockchain::FakeBlockChain;
 use elipticoin_blockchain::ElipitcoinBlockchain;
 use base_token::{BaseToken};
 use human_readable_name_registration::{HumanReadableNameRegistration};
-use error::{self, Error};
+use error::{Error};
 
 #[cfg(test)]
 extern crate rustc_serialize as serialize;

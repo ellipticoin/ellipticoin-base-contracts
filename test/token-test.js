@@ -79,7 +79,7 @@ describe('token', function() {
       assert.equal(result, 100);
     });
 
-    it.only('should return 0 for unknown addresses', async function() {
+    it('should return 0 for unknown addresses', async function() {
       var result = await wasm.call('balance_of', UNKNOWN_ADDRESS);
 
       assert.equal(result, 0);
