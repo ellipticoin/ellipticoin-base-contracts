@@ -13,6 +13,7 @@ const {
   fromBytesInt32,
   toBytesInt32,
 } = require('./support/utils.js');
+const UNKNOWN_ADDRESS = hexToBytes("0000000000000000000000000000000000000000");
 const SENDER = hexToBytes("0000000000000000000000000000000000000001");
 const RECEIVER = hexToBytes("0000000000000000000000000000000000000002");
 const ERROR_INSUFFICIENT_FUNDS = 1;
@@ -36,7 +37,7 @@ describe('token', function() {
       if(this.storage[key]) {
         return wasm.writePointer(this.storage[key]);
       } else {
-        return wasm.writePointer(new Uint8Array([0,0,0,0,0,0,0,0]));
+        return wasm.writePointer(new Uint8Array([]));
       }
     },
     write: (keyPtr, valuePtr) => {
@@ -76,6 +77,12 @@ describe('token', function() {
       var result = await wasm.call('balance_of', SENDER);
 
       assert.equal(result, 100);
+    });
+
+    it.only('should return 0 for unknown addresses', async function() {
+      var result = await wasm.call('balance_of', UNKNOWN_ADDRESS);
+
+      assert.equal(result, 0);
     });
   });
 

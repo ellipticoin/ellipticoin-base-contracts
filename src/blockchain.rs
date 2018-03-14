@@ -20,10 +20,14 @@ pub trait Valueable<T> {
 
 impl Valueable<u64> for Vec<u8> {
     fn value(&self) -> u64 {
-        let mut slice: [u8; 8] = [0; 8];
-        slice.copy_from_slice(&self[..]);
-        unsafe {
-          transmute::<[u8; 8], u64>(slice)
+        if(self.len() == 8) {
+            let mut slice: [u8; 8] = [0; 8];
+            slice.copy_from_slice(&self[..]);
+            unsafe {
+            transmute::<[u8; 8], u64>(slice)
+            }
+        } else {
+            0
         }
     }
 }
