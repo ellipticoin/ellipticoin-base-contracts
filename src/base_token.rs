@@ -1,4 +1,3 @@
-#[cfg(not(test))]
 use alloc::vec::Vec;
 use error::{self, Error};
 

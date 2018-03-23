@@ -4,7 +4,8 @@ use std::path::Path;
 use std::fs;
 const TEST_DB_PATH: &str = "tmp/test.db";
 extern crate cask;
-use blockchain::*;
+use blockchain::BlockChain;
+use wasm_rpc::*;
 use self::cask::{CaskOptions, SyncStrategy, Cask};
 
 pub const SENDER: [u8; 20] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ];
@@ -15,6 +16,19 @@ pub struct FakeBlockChain {
 }
 
 impl BlockChain for FakeBlockChain {
+    fn read(&self, key: Vec<u8>) -> Vec<u8> {
+        match self.db.get(key).unwrap() {
+            Some(x) => x,
+            None => vec![],
+        }
+    }
+
+    fn write(&self, key: Vec<u8>, value: Vec<u8>) {
+        self.db
+            .put(key, value)
+            .expect("could not put value");
+    }
+
     fn read_u32(&self, key: Vec<u8>) -> u32 {
         match self.db.get(key).unwrap() {
             Some(x) => x.value(),
@@ -36,8 +50,12 @@ impl BlockChain for FakeBlockChain {
 
     fn write_u64(&self, key: Vec<u8>, value: u64) {
         self.db
-            .put(key, Valuable::from_u64(value))
+            .put(key, FromBytes::from_u64(value))
             .expect("could not put value");
+    }
+
+    fn call(&self, _code: Vec<u8>, _method: String, _params: u32, _storage_context: Vec<u8>) -> Vec<u8> {
+        unreachable!();
     }
 }
 

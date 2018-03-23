@@ -17,11 +17,15 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[macro_use] extern crate alloc;
 extern crate rlibc;
 extern crate cbor_no_std;
+#[cfg(test)]
+extern crate core;
 
 mod blockchain;
 mod wasm_rpc;
 mod base_token;
+#[cfg(not(test))]
 mod human_readable_name_registry;
+#[cfg(not(test))]
 mod contract_registry;
 
 #[cfg(not(test))]
@@ -32,6 +36,7 @@ mod test;
 mod base_token_test;
 pub mod memory;
 pub mod error;
+#[cfg(not(test))]
 pub mod entry_point;
 pub fn main() {}
 #[cfg(not(test))]
