@@ -1,5 +1,6 @@
 #![feature(
     alloc,
+    slice_concat_ext,
     allocator_api,
     core_intrinsics,
     global_allocator,
@@ -19,7 +20,8 @@ extern crate cbor_no_std;
 
 mod blockchain;
 mod base_token;
-mod human_readable_name_registration;
+mod human_readable_name_registry;
+mod contract_registry;
 
 #[cfg(not(test))]
 mod elipticoin_blockchain;

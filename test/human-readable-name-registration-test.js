@@ -5,7 +5,6 @@ var exec = Promise.promisify(require('child_process').exec);
 const FakeBlockchain = require('./support/fake-blockchain');
 const assert = require('assert');
 const _ = require('lodash');
-const {elipticoin: {Address, Balance, TransferArgs, InitializeArgs}} = require('./support/base_token.pb.js');
 const {
   hexToAddress,
   hexToBytes,

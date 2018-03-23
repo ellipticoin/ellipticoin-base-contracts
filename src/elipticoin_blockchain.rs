@@ -9,6 +9,7 @@ use entry_point::FromWASMBytes;
 extern {
     fn sender() -> *const u8;
     fn read(key: *const u8) -> *const u8;
+    fn _call(code: *const u8, method: *const u8, params: u32, storage_context: *const u8) -> *const u8;
     fn write(key: *const u8, value: *const u8);
 }
 
@@ -54,6 +55,17 @@ impl BlockChain for ElipitcoinBlockchain {
                 key.to_vec().to_wasm_bytes(),
                 value_bytes.to_vec().to_wasm_bytes(),
             );
+        }
+    }
+
+    fn call(&self, code: Vec<u8>, method: &str, params: u32, storage_context: Vec<u8>) -> Vec<u8> {
+        unsafe {
+            _call(
+                code.to_wasm_bytes(),
+                method.as_bytes().to_vec().to_wasm_bytes(),
+                params,
+                storage_context.to_wasm_bytes()
+            ).from_wasm_bytes()
         }
     }
 }

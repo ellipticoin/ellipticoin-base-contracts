@@ -3,6 +3,7 @@ extern crate rlibc;
 extern crate wee_alloc;
 use alloc::btree_map::BTreeMap;
 use alloc::vec::Vec;
+use alloc::slice::SliceConcatExt;
 
 #[cfg(test)]
 use std::mem::transmute;
@@ -26,7 +27,8 @@ use test::fake_blockchain::FakeBlockChain;
 #[cfg(not(test))]
 use elipticoin_blockchain::ElipitcoinBlockchain;
 use base_token::{BaseToken};
-use human_readable_name_registration::{HumanReadableNameRegistration};
+use human_readable_name_registry::{HumanReadableNameRegistry};
+use contract_registry::{ContractRegistry};
 use error::{Error};
 
 #[cfg(test)]
@@ -82,33 +84,6 @@ unsafe impl ToWASMBytes for Vec<u8> {
     }
 }
 
-// pub struct FakeBlockChain {
-// }
-//
-// impl BlockChain for FakeBlockChain {
-//     fn read_u32(&self) -> u32 {
-//         19
-//     }
-// }
-//
-// pub trait BlockChain {
-//     fn read_u32(&self) -> u32;
-// }
-//
-// pub struct BaseToken<T: BlockChain>  {
-//     pub blockchain: T
-// }
-
-pub trait Params {
-    fn at(&self, n: usize) -> Value;
-}
-
-impl Params for Value {
-    fn at(&self, n: usize) -> Value {
-        self.as_array().unwrap().to_vec().iter().nth(n).unwrap().clone()
-    }
-}
-
 pub trait WASMRpc {
     fn call(&self, method: &str, params: Value) -> Pointer;
 }
@@ -120,27 +95,6 @@ fn error(code: u32) -> Value {
     let mut error_map = BTreeMap::new();
     error_map.insert("error".into(), Value::Map(error_code));
     Value::Map(error_map)
-}
-
-// TODO Generate this automatically with a #[derive(WASMRpc)]
-impl<B> WASMRpc for BaseToken<B> where B: BlockChain {
-    fn call(&self, method: &str, params: Value) -> Pointer {
-        let result = match method {
-            "balance_of" => self.balance_of(params.at(0).as_bytes().unwrap().to_vec()),
-            "constructor" => self.constructor(params.at(0).as_int().unwrap() as u64),
-            "transfer" => self.transfer(params.at(0).as_bytes().unwrap().to_vec(), params.at(1).as_int().unwrap() as u64),
-            _ => Ok(Value::Null),
-        };
-
-        match result {
-            Ok(Value::Null) => vec![].to_wasm_bytes(),
-            Ok(value) => to_bytes(value).to_wasm_bytes(),
-            Err(_) =>   {
-                to_bytes(error(1)).to_wasm_bytes()
-                // vec![].to_wasm_bytes()
-            }
-        }
-    }
 }
 
 fn to_return_value(result: Result<Value, Error>) -> Pointer {
@@ -190,33 +144,49 @@ pub fn transfer(receiver_address_ptr: Pointer, amount: u32) -> Pointer {
 
 #[no_mangle]
 pub fn register() -> Pointer {
-    let rpc =  HumanReadableNameRegistration { blockchain: ElipitcoinBlockchain {} };
+    let rpc =  HumanReadableNameRegistry { blockchain: ElipitcoinBlockchain {} };
     let result = rpc.register();
     to_return_value(result)
 }
 
 #[no_mangle]
 pub fn lookup(prefix_ptr: Pointer) -> Pointer {
-    let rpc =  HumanReadableNameRegistration { blockchain: ElipitcoinBlockchain {} };
+    let rpc =  HumanReadableNameRegistry { blockchain: ElipitcoinBlockchain {} };
     let prefix = from_bytes(prefix_ptr.from_wasm_bytes());
     let result = rpc.lookup(prefix.as_bytes().unwrap().to_vec());
     to_return_value(result)
 }
 
-// TODO Generate this automatically with a macro like
-// wasm_rpc_expose!(BaseToken { blockchain: ... })
 #[no_mangle]
-pub fn call(payload_ptr: Pointer) -> Pointer {
-    let rpc =  BaseToken {
-        // blockchain: FakeBlockChain {..Default::default()}
-        blockchain: ElipitcoinBlockchain {}
-    };
-    let bytes = payload_ptr.from_wasm_bytes();
-    let tmp_payload = from_bytes(bytes);
-    let payload = tmp_payload.as_map().unwrap();
-    let ref method = payload.get("method".into()).unwrap().as_string().unwrap();
-    let params = payload.get("params".into()).unwrap().clone();
-    rpc.call(method, params)
+pub fn deploy(name_ptr: Pointer, code_ptr: Pointer, params_ptr: Pointer) -> Pointer {
+    let rpc =  ContractRegistry { blockchain: ElipitcoinBlockchain {} };
+    let code = from_bytes(code_ptr.from_wasm_bytes());
+    let name = from_bytes(name_ptr.from_wasm_bytes());
+    let result = rpc.deploy(
+        name.as_string().unwrap(),
+        code.as_bytes().unwrap().to_vec(),
+    );
+    to_return_value(result)
+}
+
+#[no_mangle]
+pub fn call(
+    address_ptr: Pointer,
+    name_ptr: Pointer,
+    method_ptr: Pointer,
+    params: u32
+) -> Pointer {
+    let rpc =  ContractRegistry { blockchain: ElipitcoinBlockchain {} };
+    let address = from_bytes(address_ptr.from_wasm_bytes());
+    let name = from_bytes(name_ptr.from_wasm_bytes());
+    let method = from_bytes(method_ptr.from_wasm_bytes());
+    let result = rpc.call(
+        address.as_bytes().unwrap().to_vec(),
+        name.as_string().unwrap(),
+        method.as_string().unwrap(),
+        params,
+    );
+    [&vec![0,0,0,0][..], &result[..]].concat().to_wasm_bytes()
 }
 
 

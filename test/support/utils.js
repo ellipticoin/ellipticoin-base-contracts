@@ -1,5 +1,4 @@
 const protobuf = require('protobufjs');
-const {elipticoin: {Address}} = require('./base_token.pb.js');
 
 function hexToAddress(hex) {
   return Address.encode(Address.create({bytes: hexToBytes(hex)})).finish();
