@@ -4,18 +4,18 @@ use cbor_no_std::{Value};
 use error::{self, Error};
 
 use blockchain::*;
+
 pub struct BaseToken<T: BlockChain>  {
     pub blockchain: T
 }
 
 impl <B> BaseToken<B> where B: BlockChain {
-    pub fn constructor(&self, initial_supply: u64) -> Result<Value, Error> {
+    pub fn constructor(&self, initial_supply: u64) {
         self.write(self.blockchain.sender(), initial_supply);
-        Ok(Value::Null)
     }
 
-    pub fn balance_of(&self, address: Vec<u8>) -> Result<Value, Error> {
-        Ok(Value::Int(self.read(&address) as u32))
+    pub fn balance_of(&self, address: Vec<u8>) -> u64 {
+        self.read(&address)
     }
 
     pub fn transfer(&self, receiver_address: Vec<u8>, amount: u64)  -> Result<Value, Error> {

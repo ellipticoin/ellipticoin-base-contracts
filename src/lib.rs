@@ -19,6 +19,7 @@ extern crate rlibc;
 extern crate cbor_no_std;
 
 mod blockchain;
+mod wasm_rpc;
 mod base_token;
 mod human_readable_name_registry;
 mod contract_registry;
