@@ -4,7 +4,7 @@ use error::{Error};
 use alloc::slice::SliceConcatExt;
 use alloc::String;
 
-use blockchain::*;
+use blockchain::BlockChain;
 pub struct ContractRegistry<T: BlockChain>  {
     pub blockchain: T
 }

@@ -29,29 +29,8 @@ impl BlockChain for FakeBlockChain {
             .expect("could not put value");
     }
 
-    fn read_u32(&self, key: Vec<u8>) -> u32 {
-        match self.db.get(key).unwrap() {
-            Some(x) => x.value(),
-            None => 0 as u32,
-        }
-    }
-
-    fn read_u64(&self, key: Vec<u8>) -> u64 {
-        match self.db.get(key).unwrap() {
-            Some(x) => x.value(),
-            None => 0 as u64,
-        }
-    }
-
     fn sender(&self) -> Vec<u8>{
         self.sender.to_vec()
-    }
-
-
-    fn write_u64(&self, key: Vec<u8>, value: u64) {
-        self.db
-            .put(key, FromBytes::from_u64(value))
-            .expect("could not put value");
     }
 
     fn call(&self, _code: Vec<u8>, _method: String, _params: u32, _storage_context: Vec<u8>) -> Vec<u8> {

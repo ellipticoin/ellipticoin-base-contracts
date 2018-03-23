@@ -19,18 +19,6 @@ impl BlockChain for ElipitcoinBlockchain {
       }
     }
 
-    fn read_u32(&self, key: Vec<u8>) -> u32 {
-      unsafe {
-        read(key.as_pointer()).as_raw_bytes().value()
-      }
-    }
-
-    fn read_u64(&self, key: Vec<u8>) -> u64 {
-      unsafe {
-        read(key.as_pointer()).as_raw_bytes().value()
-      }
-    }
-
     fn sender(&self) -> Vec<u8> {
         unsafe{
             sender().as_raw_bytes()
@@ -42,15 +30,6 @@ impl BlockChain for ElipitcoinBlockchain {
             write(
                 key.as_pointer(),
                 value.as_pointer(),
-            );
-        }
-    }
-
-    fn write_u64(&self, key: Vec<u8>, value: u64) {
-        unsafe {
-            write(
-                key.as_pointer(),
-                FromBytes::from_u64(value).as_pointer(),
             );
         }
     }
