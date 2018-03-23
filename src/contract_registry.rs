@@ -1,6 +1,5 @@
 #[cfg(not(test))]
 use alloc::vec::Vec;
-use cbor_no_std::{Value};
 use error::{Error};
 use alloc::slice::SliceConcatExt;
 use alloc::String;
@@ -11,12 +10,12 @@ pub struct ContractRegistry<T: BlockChain>  {
 }
 
 impl <B> ContractRegistry<B> where B: BlockChain {
-    pub fn deploy(&self, contract_name: String, code: Vec<u8>) -> Result<Value, Error> {
+    pub fn deploy(&self, contract_name: String, code: Vec<u8>) -> Result<(), Error> {
         let sender = self.blockchain.sender();
         let address = [&sender[..], &contract_name.as_bytes()[..]].concat();
 
         self.blockchain.write(address, code);
-        Ok(Value::Null)
+        Ok(())
     }
 
     pub fn call(&self, account: Vec<u8>, contract_name: String, method: String, params: u32) -> Vec<u8> {

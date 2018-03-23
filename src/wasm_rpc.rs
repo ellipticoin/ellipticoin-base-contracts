@@ -72,24 +72,56 @@ unsafe impl Referenceable for String {
     }
 }
 
-pub fn to_return_value(result: Result<Value, Error>) -> Pointer {
-    let error_code = match result {
-        Err(error) => error.code,
-        _ => 0,
-    };
+pub trait ReturnValue {
+    fn to_return_value(self) -> Pointer;
+}
 
-    let mut return_value = match result {
-        Ok(Value::Null) => vec![],
-        Ok(value) => to_bytes(value),
-        Err(error) => to_bytes(Value::String(error.message.into())),
-    };
 
-    let mut error_code_bytes = unsafe {
-        transmute::<u32 ,[u8; 4]>(error_code).to_vec()
-    };
+impl ReturnValue for Result<Value, Error> {
+    fn to_return_value(self: Result<Value, Error>) -> Pointer {
+        let error_code = match self {
+            Err(error) => error.code,
+            _ => 0,
+        };
 
-    error_code_bytes.append(&mut return_value);
-    error_code_bytes.as_pointer()
+        let mut return_value = match self {
+            Ok(Value::Null) => vec![],
+            Ok(value) => to_bytes(value),
+            Err(error) => to_bytes(Value::String(error.message.into())),
+        };
+
+        let mut error_code_bytes = u32_to_u8_vec(error_code);
+
+        error_code_bytes.append(&mut return_value);
+        error_code_bytes.as_pointer()
+    }
+}
+
+impl ReturnValue for Result<(), Error> {
+    fn to_return_value(self) -> Pointer {
+        match self {
+            Ok(value) => (Ok::<Value, Error>(value.into())).to_return_value(),
+            Err(error) => (Err::<Value, Error>(error)).to_return_value()
+        }
+    }
+}
+
+impl ReturnValue for Result<u32, Error> {
+    fn to_return_value(self) -> Pointer {
+        match self {
+            Ok(value) => (Ok::<Value, Error>(value.into())).to_return_value(),
+            Err(error) => (Err::<Value, Error>(error)).to_return_value()
+        }
+    }
+}
+
+impl ReturnValue for Result<Vec<u8>, Error> {
+    fn to_return_value(self) -> Pointer {
+        match self {
+            Ok(value) => (Ok::<Value, Error>(value.into())).to_return_value(),
+            Err(error) => (Err::<Value, Error>(error)).to_return_value()
+        }
+    }
 }
 
 pub trait FromBytes {}
@@ -111,7 +143,7 @@ impl Bytes<u64> for Vec<u8> {
             let mut slice: [u8; 8] = [0; 8];
             slice.copy_from_slice(&self[..]);
             unsafe {
-            transmute::<[u8; 8], u64>(slice)
+                transmute::<[u8; 8], u64>(slice)
             }
         } else {
             0
@@ -123,8 +155,6 @@ impl Bytes<u32> for Vec<u8> {
     fn value(&self) -> u32 {
         let mut slice: [u8; 4] = [0; 4];
         slice.copy_from_slice(&self[..]);
-        unsafe {
-          transmute::<[u8; 4], u32>(slice)
-        }
+        u8_vec_to_u32(slice.to_vec())
     }
 }

@@ -17,35 +17,35 @@ use contract_registry::{ContractRegistry};
 pub fn constructor(balance: u32) -> Pointer {
     let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
     rpc.constructor(balance as u64);
-    to_return_value(Ok(Value::Null))
+    (Ok(Value::Null)).to_return_value()
 }
 
 #[no_mangle]
 pub fn balance_of(address_ptr: Pointer) -> Pointer {
     let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
     let result = rpc.balance_of(address_ptr.to_bytes());
-    to_return_value(Ok(Value::Int(result as u32)))
+    (Ok(result as u32)).to_return_value()
 }
 
 #[no_mangle]
 pub fn transfer(receiver_address_ptr: Pointer, amount: u32) -> Pointer {
     let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
     let result = rpc.transfer(receiver_address_ptr.to_bytes(), amount as u64);
-    to_return_value(result)
+    result.to_return_value()
 }
 
 #[no_mangle]
 pub fn register() -> Pointer {
     let rpc =  HumanReadableNameRegistry { blockchain: ElipitcoinBlockchain {} };
     let result = rpc.register();
-    to_return_value(result)
+    result.to_return_value()
 }
 
 #[no_mangle]
 pub fn lookup(prefix_ptr: Pointer) -> Pointer {
     let rpc =  HumanReadableNameRegistry { blockchain: ElipitcoinBlockchain {} };
     let result = rpc.lookup(prefix_ptr.to_bytes());
-    to_return_value(result)
+    result.to_return_value()
 }
 
 #[no_mangle]
@@ -55,7 +55,7 @@ pub fn deploy(name_ptr: Pointer, code_ptr: Pointer) -> Pointer {
         name_ptr.to_string(),
         code_ptr.to_bytes(),
     );
-    to_return_value(result)
+    result.to_return_value()
 }
 
 #[no_mangle]
