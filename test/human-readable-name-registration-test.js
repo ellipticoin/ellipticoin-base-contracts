@@ -55,7 +55,7 @@ describe('human readable name registration', function() {
     wasm = new FakeBlockchain({
         exports: exports,
     });
-    code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
+    code = await readFile("target/wasm32-unknown-unknown/release/base_token.wasm");
     await wasm.load(code);
   });
 
@@ -87,7 +87,7 @@ describe('human readable name registration', function() {
             },
           }
       });
-      code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
+      code = await readFile("target/wasm32-unknown-unknown/release/base_token.wasm");
       await wasm.load(code);
       await wasm.call('register', SENDER);
       assert.throws(
@@ -121,7 +121,7 @@ describe('human readable name registration', function() {
             },
           }
       });
-      code = await readFile("target/wasm32-unknown-unknown/debug/base_token.wasm");
+      code = await readFile("target/wasm32-unknown-unknown/release/base_token.wasm");
       await wasm.load(code);
       await wasm.call('register', SENDER);
       var address = await wasm.call('lookup', SENDER.slice(0, 4));

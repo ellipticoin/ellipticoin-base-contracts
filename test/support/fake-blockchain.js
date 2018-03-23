@@ -12,6 +12,8 @@ class FakeBlockchain extends SimpleWasm {
   constructor(params) {
     params.exports = {
       ...params.exports,
+      __udivti3: () => null,
+      __multi3: () => null,
       _call: (codePtr, methodPtr, params, storageContextPtr) => {
         const decoder = new StringDecoder('utf8');
         var code = this.readPointer(codePtr);

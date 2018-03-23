@@ -1,0 +1,1 @@
+rm -rf target && cargo rustc --target wasm32-unknown-unknown --release --lib -- --cfg ellipticoin && wasm-gc target/wasm32-unknown-unknown/release/base_token.wasm && ls -lah target/wasm32-unknown-unknown/release/base_token.wasm

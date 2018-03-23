@@ -2,7 +2,6 @@ use alloc::vec::Vec;
 use alloc::String;
 use error::{Error};
 use cbor_no_std::{from_bytes, to_bytes, Value};
-use core::intrinsics::transmute;
 use core::mem;
 use core::slice;
 
@@ -18,11 +17,34 @@ fn u32_to_u8_vec(x:u32) -> Vec<u8> {
     vec![b4, b3, b2, b1]
 }
 
+fn u64_to_u8_vec(x: u64) -> Vec<u8> {
+    let b1 : u8 = ((x >> 56) & 0xff) as u8;
+    let b2 : u8 = ((x >> 48) & 0xff) as u8;
+    let b3 : u8 = ((x >> 40) & 0xff) as u8;
+    let b4 : u8 = ((x >> 32) & 0xff) as u8;
+    let b5 : u8 = ((x >> 24) & 0xff) as u8;
+    let b6 : u8 = ((x >> 16) & 0xff) as u8;
+    let b7 : u8 = ((x >> 8) & 0xff) as u8;
+    let b8 : u8 = (x & 0xff) as u8;
+    vec![b8, b7, b6, b5, b4, b3, b2, b1]
+}
+
 fn u8_vec_to_u32(x: Vec<u8>) -> u32 {
     (x[3] as u32) << 24 |
         ((x[2] as u32) & 0xff) << 16 |
         ((x[1] as u32) & 0xff) << 8 |
         ((x[0] as u32) & 0xff)
+}
+
+fn u8_vec_to_u64(x: Vec<u8>) -> u64 {
+    (x[7] as u64) << 56 |
+        ((x[6] as u64) & 0xff) << 48 |
+        ((x[5] as u64) & 0xff) << 40 |
+        ((x[4] as u64) & 0xff) << 32 |
+        ((x[3] as u64) & 0xff) << 24 |
+        ((x[2] as u64) & 0xff) << 16 |
+        ((x[1] as u64) & 0xff) << 8 |
+        ((x[0] as u64) & 0xff)
 }
 
 pub unsafe trait Dereferenceable {
@@ -128,8 +150,7 @@ pub trait FromBytes {}
 
 impl FromBytes {
     pub fn from_u64(value: u64) -> Vec<u8>{
-        let bytes: [u8; 8] = unsafe { transmute(value.to_le()) };
-        bytes.to_vec()
+        u64_to_u8_vec(value)
     }
 }
 
@@ -142,9 +163,7 @@ impl Bytes<u64> for Vec<u8> {
         if self.len() == 8 {
             let mut slice: [u8; 8] = [0; 8];
             slice.copy_from_slice(&self[..]);
-            unsafe {
-                transmute::<[u8; 8], u64>(slice)
-            }
+            u8_vec_to_u64(slice.to_vec())
         } else {
             0
         }

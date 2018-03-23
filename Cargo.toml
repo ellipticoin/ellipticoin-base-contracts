@@ -3,6 +3,16 @@ name = "base_token"
 version = "0.1.0"
 authors = ["Mason Fischer <mason@kissr.co>"]
 
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+
+
 [build-dependencies]
 cask = "0.*"
 
