@@ -55,11 +55,11 @@ describe('deploying contract', function() {
     await wasm.load(code);
   });
 
-  it("should be callable after it's deployed", async function() {
-    var echoContract = await readFile("test/support/echo.wasm");
-    await wasm.call("deploy", "echo", echoContract);
-    var result = await wasm.call("call", SENDER, "echo", "echo", 7);
-    assert.equal(result.toString(), 7);
+  it.only("should be callable after it's deployed", async function() {
+    var adderContract = await readFile("test/support/adder.wasm");
+    await wasm.call("deploy", "Adder", adderContract);
+    var result = await wasm.call("call", SENDER, "Adder", "add", [1, 2]);
+    assert.equal(result, 3);
   });
 });
 

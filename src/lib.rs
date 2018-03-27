@@ -31,7 +31,7 @@ mod human_readable_name_registry;
 mod contract_registry;
 
 #[cfg(ellipticoin)]
-mod elipticoin_blockchain;
+mod ellipticoin_blockchain;
 #[cfg(test)]
 mod test;
 #[cfg(test)]

@@ -51,6 +51,7 @@ pub unsafe trait Dereferenceable {
     fn as_raw_bytes(&self) -> Vec<u8>;
     fn to_bytes(&self) -> Vec<u8>;
     fn to_string(&self) -> String;
+    fn to_array(&self) -> Vec<Value>;
 }
 
 unsafe impl Dereferenceable for Pointer {
@@ -70,6 +71,11 @@ unsafe impl Dereferenceable for Pointer {
     fn to_string(&self) -> String {
         let name = from_bytes(self.as_raw_bytes());
         name.as_string().unwrap().clone()
+    }
+
+    fn to_array(&self) -> Vec<Value> {
+        let name = from_bytes(self.as_raw_bytes());
+        name.as_array().unwrap().clone()
     }
 }
 

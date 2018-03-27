@@ -6,7 +6,7 @@ use wasm_rpc::*;
 extern {
     fn sender() -> *const u8;
     fn read(key: *const u8) -> *const u8;
-    fn _call(code: *const u8, method: *const u8, params: u32, storage_context: *const u8) -> *const u8;
+    fn _call(code: *const u8, method: *const u8, params: *const u8, storage_context: *const u8) -> *const u8;
     fn write(key: *const u8, value: *const u8);
 }
 
@@ -34,12 +34,12 @@ impl BlockChain for ElipitcoinBlockchain {
         }
     }
 
-    fn call(&self, code: Vec<u8>, method: String, params: u32, storage_context: Vec<u8>) -> Vec<u8> {
+    fn call(&self, code: Vec<u8>, method: String, params: Vec<u8>, storage_context: Vec<u8>) -> Vec<u8> {
         unsafe {
             _call(
                 code.as_pointer(),
                 method.as_pointer(),
-                params,
+                params.as_pointer(),
                 storage_context.as_pointer()
             ).as_raw_bytes()
         }

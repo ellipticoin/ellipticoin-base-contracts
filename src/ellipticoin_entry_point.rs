@@ -6,7 +6,7 @@ use cbor_no_std::{Value};
 #[cfg(test)]
 use test::fake_blockchain::FakeBlockChain;
 #[cfg(not(test))]
-use elipticoin_blockchain::ElipitcoinBlockchain;
+use ellipticoin_blockchain::ElipitcoinBlockchain;
 use base_token::{BaseToken};
 use human_readable_name_registry::{HumanReadableNameRegistry};
 use contract_registry::{ContractRegistry};
@@ -63,14 +63,14 @@ pub fn call(
     address_ptr: Pointer,
     name_ptr: Pointer,
     method_ptr: Pointer,
-    params: u32
+    params_ptr: Pointer,
 ) -> Pointer {
     let rpc =  ContractRegistry { blockchain: ElipitcoinBlockchain {} };
     let result = rpc.call(
         address_ptr.to_bytes(),
         name_ptr.to_string(),
         method_ptr.to_string(),
-        params,
+        params_ptr.to_array(),
     );
     [&vec![0,0,0,0][..], &result[..]].concat().as_pointer()
 }

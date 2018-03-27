@@ -6,7 +6,7 @@ pub trait BlockChain {
     fn read(&self, key: Vec<u8>) -> Vec<u8>;
     fn write(&self, key: Vec<u8>, value: Vec<u8>);
     fn sender(&self) -> Vec<u8>;
-    fn call(&self, code: Vec<u8>, method: String, params: u32, storage_context: Vec<u8>) -> Vec<u8>;
+    fn call(&self, code: Vec<u8>, method: String, params: Vec<u8>, storage_context: Vec<u8>) -> Vec<u8>;
 
     fn read_u32(&self, key: Vec<u8>) -> u32 {
         self.read(key).value()

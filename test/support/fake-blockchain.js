@@ -14,10 +14,11 @@ class FakeBlockchain extends SimpleWasm {
       ...params.exports,
       __udivti3: () => null,
       __multi3: () => null,
-      _call: (codePtr, methodPtr, params, storageContextPtr) => {
+      _call: (codePtr, methodPtr, paramsPtr, storageContextPtr) => {
         const decoder = new StringDecoder('utf8');
         var code = this.readPointer(codePtr);
-        var method = decoder.write(this.readPointer(methodPtr));
+        var method = decoder.write(new Buffer(this.readPointer(methodPtr)));
+        var params = cbor.decode(new Buffer(this.readPointer(paramsPtr)));
         var storageContext = this.readPointer(storageContextPtr);
         return this.writePointer(this._call(code, method, params, storageContext));
       },
@@ -31,13 +32,13 @@ class FakeBlockchain extends SimpleWasm {
       const SimpleWasm = require('/Users/masonf/src/simple-wasm');
       const code = new Buffer("${new Buffer(code).toString("hex")}", "hex");
       const storageContext = new Buffer("${new Buffer(storageContext).toString("hex")}", "hex");
-      const params = ${params};
+      const params = ${JSON.stringify(params)};
       const method = "${method}";
 
       async function run() {
         const wasm = new SimpleWasm({});
         await wasm.load(code);
-        const result = wasm.call("echo", params);
+        const result = wasm.call(method, ...params);
         process.stdout.write(cbor.encode(result));
       };
       run();`;

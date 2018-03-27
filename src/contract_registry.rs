@@ -5,6 +5,7 @@ use alloc::slice::SliceConcatExt;
 use alloc::String;
 
 use blockchain::BlockChain;
+use cbor_no_std::{to_bytes, Value};
 pub struct ContractRegistry<T: BlockChain>  {
     pub blockchain: T
 }
@@ -18,9 +19,9 @@ impl <B> ContractRegistry<B> where B: BlockChain {
         Ok(())
     }
 
-    pub fn call(&self, account: Vec<u8>, contract_name: String, method: String, params: u32) -> Vec<u8> {
+    pub fn call(&self, account: Vec<u8>, contract_name: String, method: String, params: Vec<Value>) -> Vec<u8> {
         let address = [&account[..], &contract_name.as_bytes()[..]].concat();
         let code = self.blockchain.read(address.clone());
-        self.blockchain.call(code, method, params, address)
+        self.blockchain.call(code, method, to_bytes(Value::Array(params)), address)
     }
 }
