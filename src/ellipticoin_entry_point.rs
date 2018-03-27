@@ -72,5 +72,5 @@ pub fn call(
         method_ptr.to_string(),
         params_ptr.to_array(),
     );
-    [&vec![0,0,0,0][..], &result[..]].concat().as_pointer()
+    result.as_pointer()
 }

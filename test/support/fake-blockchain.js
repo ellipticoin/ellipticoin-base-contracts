@@ -39,7 +39,10 @@ class FakeBlockchain extends SimpleWasm {
         const wasm = new SimpleWasm({});
         await wasm.load(code);
         const result = wasm.call(method, ...params);
-        process.stdout.write(cbor.encode(result));
+        process.stdout.write(Buffer.concat([
+          new Buffer([0,0,0,0]),
+          new Buffer(cbor.encode(result)),
+        ]));
       };
       run();`;
 
