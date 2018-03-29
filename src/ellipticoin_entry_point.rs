@@ -1,5 +1,3 @@
-use alloc::slice::SliceConcatExt;
-
 use wasm_rpc::*;
 use cbor_no_std::{Value};
 

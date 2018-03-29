@@ -25,7 +25,6 @@ describe('deploying contract', function() {
     read: (keyPtr) => {
       this.storage = this.storage || {};
       var key = wasm.readPointer(keyPtr);
-      // console.log(key + " -> " + this.storage[key]);
       if(this.storage[key]) {
         return wasm.writePointer(this.storage[key]);
       } else {
@@ -37,7 +36,6 @@ describe('deploying contract', function() {
       var value = wasm.readPointer(valuePtr);
 
       this.storage = this.storage || {};
-      // console.log(key + " = " + value);
       this.storage[key] = value;
     },
     throw: console.log,
@@ -55,7 +53,7 @@ describe('deploying contract', function() {
     await wasm.load(code);
   });
 
-  it.only("should be callable after it's deployed", async function() {
+  it("should be callable after it's deployed", async function() {
     var adderContract = await readFile("test/support/adder.wasm");
     await wasm.call("deploy", "Adder", adderContract);
     var result = await wasm.call("call", SENDER, "Adder", "add", [1, 2]);

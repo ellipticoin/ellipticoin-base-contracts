@@ -65,6 +65,7 @@ describe('token', function() {
 
   describe('constructor', function() {
     it('should initalize the sender with 100 tokens', async function() {
+      console.log("Balance of")
       var result = await wasm.call('balance_of', SENDER);
 
       assert.equal(result, 100);
