@@ -1,7 +1,8 @@
+extern crate ellipticoin_test_framework;
 use base_token::*;
-use test::fake_blockchain::FakeBlockChain;
-use test::fake_blockchain::SENDER;
-use test::fake_blockchain::ALICE;
+use base_token_test::ellipticoin_test_framework::FakeBlockChain;
+use base_token_test::ellipticoin_test_framework::SENDER;
+use base_token_test::ellipticoin_test_framework::ALICE;
 
 #[test]
 fn balance_of() {

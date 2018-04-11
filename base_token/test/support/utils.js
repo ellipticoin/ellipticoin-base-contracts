@@ -1,5 +1,3 @@
-const protobuf = require('protobufjs');
-
 function hexToAddress(hex) {
   return Address.encode(Address.create({bytes: hexToBytes(hex)})).finish();
 }

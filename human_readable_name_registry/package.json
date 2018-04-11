@@ -1,0 +1,24 @@
+{
+  "name": "elipticoin-base-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test",
+    "generate-protobufs": "pbjs -t static-module -w commonjs protos/*.proto > test/support/base_token.pb.js"
+  },
+  "author": "Mason Fischer",
+  "license": "MIT",
+  "devDependencies": {
+    "simple-wasm": "file:../simple-wasm"
+  },
+  "dependencies": {
+    "npm": "^5.7.1",
+    "protobufjs": "^6.8.4",
+    "to": "^0.2.9",
+    "update": "^0.7.4"
+  }
+}

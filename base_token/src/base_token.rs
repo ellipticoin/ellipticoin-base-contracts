@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 use error::{self, Error};
 
-use blockchain::*;
+use ellipticoin::*;
 
 pub struct BaseToken<T: BlockChain>  {
     pub blockchain: T

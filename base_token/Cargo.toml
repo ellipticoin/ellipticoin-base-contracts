@@ -1,0 +1,30 @@
+[package]
+name = "base_token"
+version = "0.1.0"
+authors = ["Mason Fischer <mason@kissr.co>"]
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+
+
+[build-dependencies]
+cask = "0.*"
+
+[lib]
+crate_type = ["cdylib"]
+
+[dev-dependencies]
+ellipticoin-test-framework = "0.1.0"
+
+[dependencies]
+ellipticoin = "0.1.0"
+wasm-rpc = "0.1.0"
+cbor-no-std = "0.1.0"
+wee_alloc = { git = 'https://github.com/fitzgen/wee_alloc' }
+rlibc = "1.0"

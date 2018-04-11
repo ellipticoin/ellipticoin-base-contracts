@@ -1,5 +1,0 @@
-[tasks.wasm]
-	script = [
-	"rustc +nightly --target wasm32-unknown-unknown -O --crate-type=cdylib add.rs -o public/add.big.wasm",
-	"wasm-gc public/add.big.wasm public/add.wasm",
-	]

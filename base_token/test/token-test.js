@@ -58,14 +58,13 @@ describe('token', function() {
     wasm = new FakeBlockchain({
         exports: exports,
     });
-    code = await readFile("target/wasm32-unknown-unknown/release/base_token.wasm");
+    code = await readFile("../target/wasm32-unknown-unknown/release/base_token.wasm");
     await wasm.load(code);
     await wasm.call('constructor', 100);
   });
 
   describe('constructor', function() {
     it('should initalize the sender with 100 tokens', async function() {
-      console.log("Balance of")
       var result = await wasm.call('balance_of', SENDER);
 
       assert.equal(result, 100);
@@ -120,7 +119,7 @@ describe('token', function() {
             },
           },
       });
-      code = await readFile("target/wasm32-unknown-unknown/release/base_token.wasm");
+      code = await readFile("../target/wasm32-unknown-unknown/release/base_token.wasm");
       await wasm.load(code);
       await wasm.call('constructor', 100);
       await wasm.call('transfer', RECEIVER, 20);

@@ -1,5 +1,3 @@
-#![no_std]
-
 #![feature(
     alloc,
     slice_concat_ext,
@@ -7,11 +5,8 @@
     core_intrinsics,
     global_allocator,
     lang_items,
-    // pointer_methods,
-    // rustc_private,
-    // match_default_bindings,
     )]
-// #![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(test), no_std)]
 extern crate wee_alloc;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -20,25 +15,19 @@ extern crate alloc;
 extern crate rlibc;
 extern crate cbor_no_std;
 extern crate wasm_rpc;
-#[cfg(test)]
-extern crate core;
+extern crate ellipticoin;
 
-mod blockchain;
 mod base_token;
-#[cfg(not(test))]
-mod human_readable_name_registry;
-#[cfg(not(test))]
-mod contract_registry;
 
-#[cfg(ellipticoin)]
-mod ellipticoin_blockchain;
-#[cfg(test)]
-mod test;
 #[cfg(test)]
 mod base_token_test;
-pub mod memory;
+
 pub mod error;
+#[cfg(not(test))]
+pub mod memory;
+#[cfg(not(test))]
 pub mod ellipticoin_entry_point;
+
 pub fn main() {}
 #[cfg(not(test))]
 #[lang = "panic_fmt"]
