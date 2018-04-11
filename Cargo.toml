@@ -24,6 +24,7 @@ cask = "0.*"
 
 
 [dependencies]
-cbor-no-std = { path = '../rust-cbor-no-std', features = ["no_std"] }
+wasm-rpc = "0.1.0"
+cbor-no-std = "0.1.0"
 wee_alloc = { git = 'https://github.com/fitzgen/wee_alloc' }
 rlibc = "1.0"

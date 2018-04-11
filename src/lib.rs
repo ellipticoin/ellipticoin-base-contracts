@@ -16,14 +16,14 @@ extern crate wee_alloc;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[macro_use] extern crate alloc;
+extern crate alloc;
 extern crate rlibc;
 extern crate cbor_no_std;
+extern crate wasm_rpc;
 #[cfg(test)]
 extern crate core;
 
 mod blockchain;
-mod wasm_rpc;
 mod base_token;
 #[cfg(not(test))]
 mod human_readable_name_registry;
@@ -38,9 +38,6 @@ mod test;
 mod base_token_test;
 pub mod memory;
 pub mod error;
-#[cfg(ethereum)]
-pub mod ethereum_entry_point;
-#[cfg(ellipticoin)]
 pub mod ellipticoin_entry_point;
 pub fn main() {}
 #[cfg(not(test))]

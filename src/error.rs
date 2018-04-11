@@ -1,8 +1,4 @@
-#[derive(Copy, Clone, Debug)]
-pub struct Error {
-    pub code: u32,
-    pub message: &'static str,
-}
+pub use wasm_rpc::Error;
 
 pub const INSUFFIENT_FUNDS: Error = Error {
     code: 1,
