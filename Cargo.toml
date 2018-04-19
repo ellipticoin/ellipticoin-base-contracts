@@ -3,3 +3,12 @@ members = [
   "human_readable_name_registry",
   "base_token",
 ]
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'

@@ -1,43 +1,26 @@
+#![cfg_attr(not(test), no_std)]
 #![feature(
-    alloc,
-    slice_concat_ext,
-    allocator_api,
-    core_intrinsics,
     global_allocator,
+    alloc,
+    core_intrinsics,
     lang_items,
     )]
-#![cfg_attr(not(test), no_std)]
-extern crate wee_alloc;
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
+#[cfg(not(test))]
 extern crate alloc;
-extern crate rlibc;
 extern crate cbor_no_std;
-extern crate wasm_rpc;
 extern crate ellipticoin;
-
+extern crate wasm_rpc;
+#[cfg(not(test))]
+extern crate wee_alloc;
 mod base_token;
+mod error;
 
 #[cfg(test)]
 mod base_token_test;
+#[cfg(not(test))]
+pub mod entry_point;
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+#[cfg(not(test))]
+#[lang = "panic_fmt"] fn panic_fmt() -> ! { loop {} }
 
-pub mod error;
-#[cfg(not(test))]
-pub mod memory;
-#[cfg(not(test))]
-pub mod ellipticoin_entry_point;
-
-pub fn main() {}
-#[cfg(not(test))]
-#[lang = "panic_fmt"]
-extern "C" fn panic_fmt(
-    _args: ::core::fmt::Arguments,
-    _file: &'static str,
-    _line: u32
-) -> ! {
-    use core::intrinsics;
-    unsafe {
-        intrinsics::abort();
-    }
-}

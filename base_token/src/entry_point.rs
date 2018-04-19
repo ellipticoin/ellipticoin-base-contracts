@@ -3,7 +3,9 @@ use wasm_rpc::{
     Pointer,
     Responsable,
 };
-use cbor_no_std::{Value};
+use cbor_no_std::{
+    Value,
+};
 
 #[cfg(test)]
 use test::fake_blockchain::FakeBlockChain;
@@ -20,9 +22,11 @@ pub fn constructor(balance: u32) -> Pointer {
     (Ok(Value::Null)).to_response()
 }
 
+
 #[no_mangle]
 pub fn balance_of(address_ptr: Pointer) -> Pointer {
     let rpc =  BaseToken { blockchain: ElipitcoinBlockchain {} };
+
     let result = rpc.balance_of(address_ptr.to_bytes());
     (Ok(result as u32)).to_response()
 }
