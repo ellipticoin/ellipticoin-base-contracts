@@ -1,8 +1,7 @@
 extern crate cbor_lite;
 extern crate ellipticoin;
 extern crate wasm_rpc;
-mod base_token;
-mod error;
+mod base_api;
 
 #[cfg(test)]
 mod base_token_test;

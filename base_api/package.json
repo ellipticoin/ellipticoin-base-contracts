@@ -1,14 +1,13 @@
 {
-  "name": "elipticoin-base-contracts",
-  "version": "1.0.0",
+  "name": "elipticoin-base-api",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test",
-    "generate-protobufs": "pbjs -t static-module -w commonjs protos/*.proto > test/support/base_token.pb.js"
+    "test": "mocha test"
   },
   "author": "Mason Fischer",
   "license": "MIT",

@@ -1,10 +1,8 @@
 use wasm_rpc::{
     Dereferenceable,
     Pointer,
-    Referenceable,
     Responsable,
 };
-use cbor_no_std::{Value};
 
 #[cfg(test)]
 use test::fake_blockchain::FakeBlockChain;

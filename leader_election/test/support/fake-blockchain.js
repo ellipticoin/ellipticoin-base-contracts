@@ -2,14 +2,25 @@ const WasmRPC = require('/Users/masonf/src/simple-wasm');
 const { execFileSync } = require('child_process');
 const cbor = require('cbor');
 const { StringDecoder } = require('string_decoder');
+const {
+  recoverPublicKey
+} = require('./utils');
 
 class FakeBlockchain extends WasmRPC {
   constructor(params) {
     super({
       exports: {
       rust_begin_unwind: () => null,
-      sender: () => {
+      _sender: () => {
         return this.writePointer(params.defaultSender);
+      },
+      _secp256k1_recover: (messagePtr, v, rPtr, sPtr) => {
+        let message = this.readPointer(messagePtr);
+        let r = this.readPointer(rPtr);
+        let s = this.readPointer(sPtr);
+        let publicKey = recoverPublicKey(message, v, r, s);
+
+        return this.writePointer(publicKey);
       },
       read: (keyPtr) => {
         var key = this.readPointer(keyPtr);

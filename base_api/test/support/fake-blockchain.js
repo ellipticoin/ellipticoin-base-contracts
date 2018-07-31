@@ -8,8 +8,11 @@ class FakeBlockchain extends WasmRPC {
     super({
       exports: {
       rust_begin_unwind: () => null,
-      sender: () => {
+      _sender: () => {
         return this.writePointer(params.defaultSender);
+      },
+      _block_hash: () => {
+        return this.writePointer(params.blockHash);
       },
       read: (keyPtr) => {
         var key = this.readPointer(keyPtr);
@@ -62,7 +65,7 @@ class FakeBlockchain extends WasmRPC {
       async function run() {
         const wasm = new WasmRPC({
           exports: {
-            sender: () => {
+            _sender: () => {
               return wasm.writePointer(hexToBytes("0000000000000000000000000000000000000001"));
             },
             read: (keyPtr) => {

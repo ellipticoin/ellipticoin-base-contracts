@@ -3,7 +3,7 @@ use wasm_rpc::{
     Pointer,
     Responsable,
 };
-use cbor_no_std::{
+use cbor_lite::{
     Value,
 };
 

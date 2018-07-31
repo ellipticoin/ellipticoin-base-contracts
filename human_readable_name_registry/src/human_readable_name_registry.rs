@@ -1,4 +1,3 @@
-use alloc::vec::Vec;
 use error::{self, Error};
 const EMPTY: [u8; 0] = [];
 

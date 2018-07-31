@@ -1,4 +1,3 @@
-use alloc::vec::Vec;
 use error::{self, Error};
 
 use ellipticoin::*;
