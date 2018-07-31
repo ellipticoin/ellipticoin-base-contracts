@@ -1,9 +1,9 @@
 const FakeBlockchain = require('./support/fake-blockchain');
 const assert = require('assert');
 const _ = require('lodash');
-const UNKNOWN_ADDRESS = new Buffer("0000000000000000000000000000000000000000", "hex");
-const SENDER = new Buffer("0000000000000000000000000000000000000001", "hex");
-const RECEIVER = new Buffer("0000000000000000000000000000000000000002", "hex");
+const UNKNOWN_ADDRESS = Buffer.from("0000000000000000000000000000000000000000", "hex");
+const SENDER = Buffer.from("0000000000000000000000000000000000000001", "hex");
+const RECEIVER = Buffer.from("0000000000000000000000000000000000000002", "hex");
 const ERROR_INSUFFICIENT_FUNDS = 1;
 const ERROR_CODES = {
   INSUFFIENT_FUNDS: 1,

@@ -1,42 +1,35 @@
-use error::{self, Error};
-
+use alloc::string::String;
+use alloc::vec::Vec;
+use wasm_rpc::{
+    Responsable,
+    Dereferenceable,
+    Pointer,
+    Error,
+};
+pub const INSUFFIENT_FUNDS: Error = Error {
+    code: 1,
+    message: "insufficient funds"
+};
 use ellipticoin::*;
 
-pub struct BaseToken<T: BlockChain>  {
-    pub blockchain: T
+pub fn constructor(initial_supply: u32) -> Result<(), Error> {
+    write_u32(sender(), initial_supply);
+    Ok(())
 }
 
-impl <B> BaseToken<B> where B: BlockChain {
-    pub fn constructor(&self, initial_supply: u64) {
-        self.write(self.sender(), initial_supply);
-    }
+pub fn balance_of(address: Pointer) -> Result<u32, Error> {
+    Ok(read_u32(address.to_bytes()))
+}
 
-    pub fn balance_of(&self, address: Vec<u8>) -> u64 {
-        self.read(&address)
-    }
+pub fn transfer(receiver_address: Pointer, amount: u32) -> Result<(), Error> {
+    let sender_balance = read_u32(sender());
+    let receiver_balance = read_u32(receiver_address.to_bytes());
 
-    pub fn transfer(&self, receiver_address: Vec<u8>, amount: u64)  -> Result<(), Error> {
-        let sender_balance = self.read(&self.sender());
-        let receiver_balance = self.read(&receiver_address);
-
-        if sender_balance > amount {
-            self.write(self.sender(), sender_balance - amount);
-            self.write(receiver_address, receiver_balance + amount);
-            Ok(())
-        } else {
-            Err(error::INSUFFIENT_FUNDS)
-        }
-    }
-
-    fn sender(&self) -> Vec<u8> {
-        self.blockchain.sender()
-    }
-
-    fn read(&self, key: &Vec<u8>) -> u64 {
-        self.blockchain.read_u64(key.to_vec())
-    }
-
-    fn write(&self, key: Vec<u8>, value: u64) {
-        self.blockchain.write_u64(key, value)
+    if sender_balance > amount {
+        write_u32(sender(), sender_balance - amount);
+        write_u32(receiver_address.to_bytes(), receiver_balance + amount);
+        Ok(())
+    } else {
+        Err(INSUFFIENT_FUNDS)
     }
 }
