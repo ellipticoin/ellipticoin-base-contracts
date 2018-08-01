@@ -15,10 +15,11 @@ opt-level = 'z'
 crate_type = ["cdylib"]
 
 [dev-dependencies]
-ellipticoin-test-framework = "0.1.0"
+ellipticoin-test-framework = {"path" = "../../rust-ellipticoin-test-framework"}
 
 [dependencies]
-wee_alloc = {"git" = "https://github.com/rustwasm/wee_alloc"}
+ellipticoin = {"path" = "../../rust-ellipticoin"}
 wasm-rpc = { path = "../../rust-wasm-rpc/wasm-rpc"}
+wee_alloc = "0.4.2"
 wasm-rpc-macros = { path = "../../rust-wasm-rpc/wasm-rpc-macros"}
 cbor-lite = "0.1.1"

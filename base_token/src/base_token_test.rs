@@ -1,35 +1,34 @@
-extern crate ellipticoin_test_framework;
-use base_token::*;
-use base_token_test::ellipticoin_test_framework::FakeBlockChain;
-use base_token_test::ellipticoin_test_framework::SENDER;
-use base_token_test::ellipticoin_test_framework::ALICE;
+use base_token::{
+    constructor,
+    balance_of,
+    transfer,
+};
+use ellipticoin::ALICE;
+use ellipticoin::BOB;
+use ellipticoin::set_sender;
 
 #[test]
-fn balance_of() {
-    let fake_blockchain =  FakeBlockChain {..Default::default()};
-    let base_token =  BaseToken { blockchain: fake_blockchain };
-    base_token.constructor(100);
-    let balance = base_token.balance_of(SENDER.to_vec());
+fn test_balance_of() {
+    set_sender(ALICE.to_vec());
+    constructor(100).unwrap();
+    let balance = balance_of(ALICE.to_vec()).unwrap();
     assert_eq!(balance, 100);
 }
 
 #[test]
-fn transfer() {
-    let fake_blockchain =  FakeBlockChain {..Default::default()};
-    let base_token =  BaseToken { blockchain: fake_blockchain };
-    base_token.constructor(100);
-    base_token.transfer(ALICE.to_vec(), 20).unwrap();
-    let senders_balance = base_token.balance_of(SENDER.to_vec());
-    assert_eq!(senders_balance, 80);
-    let alices_balance = base_token.balance_of(ALICE.to_vec());
-    assert_eq!(alices_balance, 20);
+fn test_transfer() {
+    set_sender(ALICE.to_vec());
+    constructor(100).unwrap();
+    transfer(BOB.to_vec(), 20).unwrap();
+    let alices_balance = balance_of(ALICE.to_vec()).unwrap();
+    assert_eq!(alices_balance, 80);
+    let bobs_balance = balance_of(BOB.to_vec()).unwrap();
+    assert_eq!(bobs_balance, 20);
 }
 
 #[test]
-#[should_panic]
-fn transfer_insufficient_funds() {
-    let fake_blockchain =  FakeBlockChain {..Default::default()};
-    let base_token =  BaseToken { blockchain: fake_blockchain };
-    base_token.constructor(100);
-    base_token.transfer(ALICE.to_vec(), 120).unwrap();
+fn test_transfer_insufficient_funds() {
+    set_sender(ALICE.to_vec());
+    constructor(100).unwrap();
+    assert!(transfer(BOB.to_vec(), 120).is_err());
 }

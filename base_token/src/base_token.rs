@@ -1,33 +1,30 @@
-use alloc::string::String;
+use wasm_rpc::Error;
 use alloc::vec::Vec;
-use wasm_rpc::{
-    Responsable,
-    Dereferenceable,
-    Pointer,
-    Error,
-};
-pub const INSUFFIENT_FUNDS: Error = Error {
-    code: 1,
-    message: "insufficient funds"
-};
-use ellipticoin::*;
 
-pub fn constructor(initial_supply: u32) -> Result<(), Error> {
-    write_u32(sender(), initial_supply);
+use ellipticoin::{
+    read_int,
+    sender,
+    write_int,
+};
+
+use error::INSUFFIENT_FUNDS;
+
+pub fn constructor(initial_supply: u64) -> Result<(), Error> {
+    write_int(sender(), initial_supply);
     Ok(())
 }
 
-pub fn balance_of(address: Pointer) -> Result<u32, Error> {
-    Ok(read_u32(address.to_bytes()))
+pub fn balance_of(address: Vec<u8>) -> Result<u64, Error> {
+    Ok(read_int(address))
 }
 
-pub fn transfer(receiver_address: Pointer, amount: u32) -> Result<(), Error> {
-    let sender_balance = read_u32(sender());
-    let receiver_balance = read_u32(receiver_address.to_bytes());
+pub fn transfer(receiver_address: Vec<u8>, amount: u64) -> Result<(), Error> {
+    let sender_balance = read_int(sender());
+    let receiver_balance = read_int(receiver_address.clone());
 
     if sender_balance > amount {
-        write_u32(sender(), sender_balance - amount);
-        write_u32(receiver_address.to_bytes(), receiver_balance + amount);
+        write_int(sender(), sender_balance - amount);
+        write_int(receiver_address, receiver_balance + amount);
         Ok(())
     } else {
         Err(INSUFFIENT_FUNDS)
