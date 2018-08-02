@@ -9,7 +9,7 @@ function sign(message, privateKey) {
 }
 
 function recoverPublicKey(message, v, r, s) {
-  return new Buffer(ec.recoverPubKey(message, {r, s}, v).encode('binary'), "binary");
+  return Buffer.from(ec.recoverPubKey(message, {r, s}, v).encode('binary'), "binary");
 }
 
 genPrivateKey = () => {
@@ -19,7 +19,7 @@ return ec.genKeyPair().priv;
 function sha3(input){
   let d = new SHA3.SHA3Hash();
   d.update(input);
-  return new Buffer(d.digest(), "binary");
+  return Buffer.from(d.digest(), "binary");
 }
 
 function hexToAddress(hex) {
@@ -28,7 +28,7 @@ function hexToAddress(hex) {
 function hexToBytes(hex) {
     for (var bytes = [], c = 0; c < hex.length; c += 2)
     bytes.push(parseInt(hex.substr(c, 2), 16));
-    return new Buffer(bytes);
+    return Buffer.from(bytes);
 }
 
 // Convert a byte array to a hex string
