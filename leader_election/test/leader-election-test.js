@@ -33,7 +33,7 @@ describe("LeaderElection", function() {
   describe("constructor", function() {
     it("should set the random seed signature", async function() {
       await blockchain.call("constructor", randomSeed);
-      var lastSignature = await blockchain.call("last_signature");
+      var lastSignature = await blockchain.readStorage("last_signature");
 
       assert.deepEqual(lastSignature, randomSeed);
     });
@@ -45,12 +45,12 @@ describe("LeaderElection", function() {
       let blockHash = sha3("");
       let privateKey = PRIVATE_KEY;
 
-      var lastSignature = await blockchain.call("last_signature");
+      var lastSignature = await blockchain.readStorage("last_signature");
       let signature = sign(lastSignature, privateKey);
 
       await blockchain.call("submit_block", blockHash, ...signature, Buffer.from(PUBLIC_KEY, "hex"));
 
-      assert.deepEqual(await blockchain.call("block_hash"), blockHash);
+      assert.deepEqual(await blockchain.readStorage("block_hash"), blockHash);
     });
   });
 });

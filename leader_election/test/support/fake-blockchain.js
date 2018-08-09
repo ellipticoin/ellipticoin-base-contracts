@@ -14,17 +14,20 @@ class FakeBlockchain extends WasmRPC {
       _sender: () => {
         return this.writePointer(params.defaultSender);
       },
-      _secp256k1_recover: (messagePtr, v, rPtr, sPtr) => {
+      _block_winner: () => {
+        return this.writePointer(params.defaultSender);
+      },
+      _secp256k1_recover: (messagePtr, signaturePtr, recoveryId) => {
         let message = this.readPointer(messagePtr);
-        let r = this.readPointer(rPtr);
-        let s = this.readPointer(sPtr);
-        let publicKey = recoverPublicKey(message, v, r, s);
+        let signature = this.readPointer(signaturePtr);
+        let publicKey = recoverPublicKey(message, signature, recoveryId);
 
         return this.writePointer(publicKey);
       },
       rust_oom: () => null,
       _read: (keyPtr) => {
-        var key = this.readPointer(keyPtr);
+        const decoder = new StringDecoder('utf8');
+        var key = decoder.write(Buffer.from(this.readPointer(keyPtr)));
         if(this.storage[key]) {
           return this.writePointer(this.storage[key]);
         } else {
@@ -32,7 +35,8 @@ class FakeBlockchain extends WasmRPC {
         }
       },
       _write: (keyPtr, valuePtr) => {
-        var key = this.readPointer(keyPtr);
+        const decoder = new StringDecoder('utf8');
+        var key = decoder.write(Buffer.from(this.readPointer(keyPtr)));
         var value = this.readPointer(valuePtr);
 
         this.storage[key] = value;
@@ -56,6 +60,9 @@ class FakeBlockchain extends WasmRPC {
 
   reset() {
     this.storage = {};
+  }
+  readStorage(key) {
+    return this.storage[key];
   }
   _call(code, method, params, storageContext) {
     var runWasmCode = `

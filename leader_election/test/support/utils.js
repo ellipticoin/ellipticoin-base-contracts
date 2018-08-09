@@ -5,11 +5,11 @@ var ec = new EC('secp256k1');
 function sign(message, privateKey) {
   let keyPair = ec.keyFromPrivate(privateKey);
   let signature = keyPair.sign(message);
-  return [signature.recoveryParam, signature.r.toBuffer(), signature.s.toBuffer()];
+  return [Buffer.concat([signature.r.toBuffer(), signature.s.toBuffer()]), signature.recoveryParam];
 }
 
-function recoverPublicKey(message, v, r, s) {
-  return Buffer.from(ec.recoverPubKey(message, {r, s}, v).encode('binary'), "binary");
+function recoverPublicKey(message, signature, recoveryId) {
+  return Buffer.from(ec.recoverPubKey(message, {r: signature.slice(0,32), s: signature.slice(32,64)}, recoveryId).encode('binary'), "binary");
 }
 
 genPrivateKey = () => {
