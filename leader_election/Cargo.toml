@@ -20,5 +20,6 @@ rand = "0.4"
 [dependencies]
 ellipticoin = {"path" = "../../rust-ellipticoin"}
 wasm-rpc = { path = "../../rust-wasm-rpc/wasm-rpc"}
+cbor-no-std = { path = "../../rust-cbor-no-std"}
 wee_alloc = "0.4.2"
 wasm-rpc-macros = { path = "../../rust-wasm-rpc/wasm-rpc-macros"}

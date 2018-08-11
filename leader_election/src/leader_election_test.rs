@@ -3,6 +3,7 @@ use leader_election::{
     constructor,
     submit_block,
     block_winner,
+    balance_of,
 };
 use ellipticoin::{
     set_sender,
@@ -49,14 +50,16 @@ fn test_submit_block_invalid_signature() {
 
 #[test]
 fn test_update_balance() {
+    constructor(random_bytes(32)).unwrap();
     set_sender(alice());
     set_block_winner(alice());
     update_balance(bob(), 99).unwrap();
-    assert_eq!(read_u64(bob()), 99);
+    assert_eq!(balance_of(bob()).unwrap(), 99);
 }
 
 #[test]
 fn test_update_balance_permission_denied() {
+    constructor(random_bytes(32)).unwrap();
     set_sender(alice());
     set_block_winner(bob());
     let first_blacksmith = random_bytes(32);

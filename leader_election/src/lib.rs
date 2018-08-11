@@ -16,6 +16,7 @@ extern crate alloc;
 extern crate wasm_rpc;
 extern crate wasm_rpc_macros;
 extern crate wee_alloc;
+extern crate cbor_no_std;
 #[cfg(test)]
 extern crate ellipticoin_test_framework;
 #[cfg(not(test))]
