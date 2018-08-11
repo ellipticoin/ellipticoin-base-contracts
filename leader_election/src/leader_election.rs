@@ -13,11 +13,10 @@ use ellipticoin::{
     secp256k1_recover,
     write,
     update,
-    write_u64,
 };
 
 pub fn constructor(random_seed: Vec<u8>) -> Result<(), Error> {
-    let balances: BTreeMap<Vec<u8>, Value> = BTreeMap::new();
+    let balances: BTreeMap<Value, Value> = BTreeMap::new();
 
     write("balances", to_bytes(balances.into()));
     write("last_signature", random_seed);
@@ -41,9 +40,9 @@ pub fn submit_block(
 
 pub fn update_balance(address: Vec<u8>, amount: u64) -> Result<(), Error> {
     if sender() == external_block_winner() {
-        update("balances", &|balances_vec: Vec<u8>| {
-            let mut balances: BTreeMap<Vec<u8>, Value> = from_bytes(balances_vec).as_map_mut().unwrap().clone();
-            balances.insert(address.clone(), amount.into());
+        update("balances", &|balance_bytes: Vec<u8>| {
+            let mut balances: BTreeMap<Value, Value> = from_bytes(balances_bytes).into();
+            balances.insert(address.clone().into(), amount.into());
             to_bytes(balances.into())
         });
         Ok(())
@@ -53,10 +52,10 @@ pub fn update_balance(address: Vec<u8>, amount: u64) -> Result<(), Error> {
 }
 
 pub fn balance_of(address: Vec<u8>) -> Result<u64, Error> {
-    let balances: BTreeMap<Vec<u8>, Value> = from_bytes(read("balances")).as_map().unwrap().clone();
+    let balances: BTreeMap<Value, Value> = from_bytes(read("balances")).into();
 
-    match balances.get(&address) {
-        Some(value) => Ok(value.as_int().unwrap()),
+    match balances.get(&address.into()) {
+        Some(value) => Ok(value.as_int()?),
         None => Ok(0)
     }
 }

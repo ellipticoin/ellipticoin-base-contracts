@@ -8,7 +8,6 @@ use leader_election::{
 use ellipticoin::{
     set_sender,
     set_block_winner,
-    read_u64,
     read,
 };
 use ellipticoin_test_framework::{
