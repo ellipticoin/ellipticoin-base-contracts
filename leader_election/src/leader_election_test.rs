@@ -1,4 +1,5 @@
 use leader_election::{
+    total_stake,
     update_balance,
     constructor,
     submit_block,
@@ -19,6 +20,7 @@ use ellipticoin_test_framework::{
     secp256k1_sign_recoverable,
 };
 
+use std::u64::MAX;
 
 #[test]
 fn test_constructor() {
@@ -67,7 +69,7 @@ fn test_update_balance_permission_denied() {
 
 #[test]
 fn test_winner() {
-    let random_seed = vec![32; 7];
+    let random_seed = vec![7; 32];
     constructor(random_seed).unwrap();
     set_sender(alice());
     set_block_winner(alice());
@@ -75,4 +77,16 @@ fn test_winner() {
     update_balance(bob(), 100).unwrap();
     update_balance(carol(), 100).unwrap();
     assert_eq!(block_winner().unwrap(), alice());
+}
+
+#[test]
+fn test_total_stake() {
+    let random_seed = vec![7; 32];
+    constructor(random_seed).unwrap();
+    set_sender(alice());
+    set_block_winner(alice());
+    update_balance(alice(), 100).unwrap();
+    update_balance(bob(), 100).unwrap();
+    update_balance(carol(), 100).unwrap();
+    assert_eq!(total_stake().unwrap(), 300);
 }

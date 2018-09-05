@@ -18,6 +18,7 @@ mock-ellipticoin = {"path" = "../../rust-mock-ellipticoin"}
 secp256k1 = {git = "https://github.com/rust-bitcoin/rust-secp256k1", features = ["rand"]}
 rand = "0.4"
 [dependencies]
+lazy_static = "1.1.0"
 ellipticoin = {"path" = "../../rust-ellipticoin"}
 wasm-rpc = { path = "../../rust-wasm-rpc/wasm-rpc"}
 cbor-no-std = { path = "../../rust-cbor-no-std"}

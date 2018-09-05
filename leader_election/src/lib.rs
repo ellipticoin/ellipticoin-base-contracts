@@ -24,9 +24,11 @@ extern crate ellipticoin;
 #[cfg(test)]
 extern crate mock_ellipticoin as ellipticoin;
 
+
 #[cfg(not(test))]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 
 #[cfg(not(test))]
 use core::panic::PanicInfo;
@@ -43,6 +45,7 @@ fn out_of_memory(_: ::core::alloc::Layout) -> ! {
     loop {}
 }
 
+mod error;
 
 #[cfg(not(test))]
 use self::wasm_rpc_macros::export;
@@ -50,8 +53,6 @@ use self::wasm_rpc_macros::export;
 #[cfg(not(test))]
 #[export]
 mod leader_election;
-#[cfg(test)]
-mod error;
 
 #[cfg(test)]
 mod leader_election;
