@@ -22,7 +22,7 @@ pub fn transfer(receiver_address: Vec<u8>, amount: u64) -> Result<(), Error> {
     let sender_balance = read_int(sender());
     let receiver_balance = read_int(receiver_address.clone());
 
-    if sender_balance > amount {
+    if sender_balance => amount {
         write_int(sender(), sender_balance - amount);
         write_int(receiver_address, receiver_balance + amount);
         Ok(())

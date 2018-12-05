@@ -17,7 +17,7 @@ describe('BaseToken', function() {
       defaultSender: SENDER,
     });
 
-    await blockchain.loadFile("../target/wasm32-unknown-unknown/release/base_token.wasm");
+    await blockchain.loadFile("dist/base_token.wasm");
   });
 
   afterEach(() => blockchain.reset());

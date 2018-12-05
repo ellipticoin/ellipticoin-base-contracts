@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "base_api",
+  "user_contracts",
   "human_readable_name_registry",
   "base_token",
   "leader_election"

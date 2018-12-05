@@ -1,4 +1,4 @@
-const WasmRPC = require('/Users/masonf/src/simple-wasm').default;
+const WasmRPC = require('/Users/masonf/src/js-wasm-rpc-client').default;
 const { execFileSync } = require('child_process');
 const cbor = require('cbor');
 const { StringDecoder } = require('string_decoder');
@@ -14,6 +14,7 @@ class FakeBlockchain extends WasmRPC {
       _read: (keyPtr) => {
         var key = this.readPointer(keyPtr);
         if(this.storage[key]) {
+          // console.log(`${key} -> ${this.storage[key]}`)
           return this.writePointer(this.storage[key]);
         } else {
           return this.writePointer(new Uint8Array([]));
@@ -23,6 +24,7 @@ class FakeBlockchain extends WasmRPC {
         var key = this.readPointer(keyPtr);
         var value = this.readPointer(valuePtr);
 
+        // console.log(`${key} = ${value}`)
         this.storage[key] = value;
       },
       throw: console.log,

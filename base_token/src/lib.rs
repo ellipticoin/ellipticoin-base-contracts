@@ -21,22 +21,6 @@ extern crate wee_alloc;
 #[cfg(not(test))]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-#[cfg(not(test))]
-use core::panic::PanicInfo;
-
-#[cfg(not(test))]
-#[panic_implementation]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
-
-#[cfg(not(test))]
-#[alloc_error_handler]
-fn out_of_memory(_: ::core::alloc::Layout) -> ! {
-    loop {}
-}
-
-
 mod error;
 
 #[cfg(not(test))]
