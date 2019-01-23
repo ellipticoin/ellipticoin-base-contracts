@@ -1,32 +1,58 @@
-use wasm_rpc::Error;
-use alloc::vec::Vec;
+use wasm_rpc_macros::{export, get, require, set};
+use ellipticoin::{sender, error};
+use wasm_rpc::Value;
+use wasm_rpc::error::Error;
 
-use ellipticoin::{
-    read_int,
-    sender,
-    write_int,
-};
 
-use error::INSUFFIENT_FUNDS;
-
-pub fn constructor(initial_supply: u64) -> Result<(), Error> {
-    write_int(sender(), initial_supply);
-    Ok(())
+#[export]
+pub fn constructor(initial_supply: u64) {
+    set!("balances", sender(), initial_supply);
 }
 
-pub fn balance_of(address: Vec<u8>) -> Result<u64, Error> {
-    Ok(read_int(address))
+#[export]
+pub fn balance_of(address: Vec<u8>) -> u64 {
+    get!("balances", address)
 }
 
-pub fn transfer(receiver_address: Vec<u8>, amount: u64) -> Result<(), Error> {
-    let sender_balance = read_int(sender());
-    let receiver_balance = read_int(receiver_address.clone());
+#[export]
+pub fn transfer(receiver_address: Vec<u8>, amount: u64) -> Result<Value, Error> {
+    let sender_balance: u64 = get!("balances", sender());
+    let receiver_balance: u64 = get!("balances", receiver_address);
+    require!(sender_balance >= amount, error::INSUFFICIENT_FUNDS);
+    set!("balances", sender(), sender_balance - amount);
+    set!("balances", receiver_address, receiver_balance + amount);
+    Ok(Value::Null)
+}
 
-    if sender_balance => amount {
-        write_int(sender(), sender_balance - amount);
-        write_int(receiver_address, receiver_balance + amount);
-        Ok(())
-    } else {
-        Err(INSUFFIENT_FUNDS)
+#[cfg(test)]
+mod tests {
+    use super::{balance_of, constructor, transfer};
+    use ellipticoin::set_sender;
+    use ellipticoin_test_framework::{alice, bob};
+
+    #[test]
+    fn test_transfer() {
+        set_sender(alice());
+        constructor(100);
+        transfer(bob(), 20);
+        let alices_balance = balance_of(alice());
+        assert_eq!(alices_balance, 80);
+        let bobs_balance = balance_of(bob());
+        assert_eq!(bobs_balance, 20);
+    }
+
+    #[test]
+    fn test_balance_of() {
+        set_sender(alice());
+        constructor(100);
+        let balance = balance_of(alice());
+        assert_eq!(balance, 100);
+    }
+
+    #[test]
+    fn test_transfer_insufficient_funds() {
+        set_sender(alice());
+        constructor(100);
+        assert!(transfer(bob(), 120).is_err());
     }
 }

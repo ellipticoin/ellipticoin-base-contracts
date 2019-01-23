@@ -1,0 +1,27 @@
+[package]
+name = "user_contracts"
+version = "0.1.0"
+authors = ["Mason Fischer <mason@kissr.co>"]
+
+[profile.release]
+debug = false
+lto = true
+opt-level = 'z'
+
+[lib]
+crate_type = ["cdylib"]
+
+[dev-dependencies]
+ellipticoin = {"path" = "../../rust-ellipticoin"}
+ellipticoin-test-framework = {"path" = "../../rust-ellipticoin-test-framework"}
+mock-ellipticoin = {"path" = "../../rust-mock-ellipticoin"}
+secp256k1 = {git = "https://github.com/rust-bitcoin/rust-secp256k1", features = ["rand"]}
+rand = "0.4"
+
+[dependencies]
+lazy_static = "1.1.0"
+ellipticoin = {"path" = "../../rust-ellipticoin"}
+wasm-rpc = { path = "../../rust-wasm-rpc/wasm-rpc"}
+cbor-no-std = { path = "../../rust-cbor-no-std"}
+wee_alloc = "0.4.2"
+wasm-rpc-macros = { path = "../../rust-wasm-rpc/wasm-rpc-macros"}

@@ -1,19 +1,4 @@
-#![no_std]
-#![feature(
-    alloc,
-    panic_implementation,
-    alloc_error_handler,
-    use_extern_macros,
-    proc_macro_mod,
-    proc_macro_gen,
-)]
-extern crate alloc;
-extern crate wasm_rpc;
-extern crate wasm_rpc_macros;
-#[cfg(not(test))]
-extern crate ellipticoin;
-#[cfg(test)]
-extern crate ellipticoin_test_framework as ellipticoin;
+#![feature(alloc, proc_macro_hygiene)]
 
 #[cfg(not(test))]
 extern crate wee_alloc;
@@ -21,17 +6,15 @@ extern crate wee_alloc;
 #[cfg(not(test))]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-mod error;
-
+extern crate alloc;
 #[cfg(not(test))]
-use self::wasm_rpc_macros::export;
-
-
-#[cfg(not(test))]
-#[export]
-mod base_token;
-#[cfg(test)]
-mod base_token;
+extern crate ellipticoin;
+extern crate wasm_rpc;
+extern crate wasm_rpc_macros;
 
 #[cfg(test)]
-mod base_token_test;
+extern crate ellipticoin_test_framework;
+#[cfg(test)]
+extern crate mock_ellipticoin as ellipticoin;
+
+pub mod base_token;

@@ -46,7 +46,7 @@ fn test_submit_block_invalid_signature() {
     let block_hash = random_bytes(32);
     let (recovery_id, signature) = secp256k1_sign_recoverable(invalid_value, alices_private_key());
     constructor(random_seed.clone()).unwrap();
-    assert!(submit_block(block_hash, signature.to_vec(), recovery_id, alices_private_key()).is_err());
+    assert!(submit_block(block_hash, signature.to_vec(), recovery_id, alice()).is_err());
 }
 
 #[test]

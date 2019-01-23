@@ -17,7 +17,7 @@ describe('BaseToken', function() {
       defaultSender: SENDER,
     });
 
-    await blockchain.loadFile("dist/base_token.wasm");
+    await blockchain.loadFile("../target/wasm32-unknown-unknown/debug/base_token.wasm");
   });
 
   afterEach(() => blockchain.reset());
@@ -67,10 +67,10 @@ describe('BaseToken', function() {
     });
 
     it('returns an error if you try to send more tokens than you have', async function() {
-      assert.throws(
-        () => blockchain.call("transfer", RECEIVER, 120),
-        /insufficient funds/,
-      );
+      await blockchain.call("transfer", RECEIVER, 120).catch((error) => {
+        assert.equal(error.message, "insufficient funds")
+        assert.equal(error.code, ERROR_CODES.INSUFFIENT_FUNDS)
+      });
     });
   });
 });
