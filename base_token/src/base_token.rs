@@ -1,32 +1,39 @@
-use wasm_rpc_macros::{export, get, require, set};
-use ellipticoin::{sender, error};
-use wasm_rpc::Value;
-use wasm_rpc::error::Error;
-
-
-#[export]
-pub fn constructor(initial_supply: u64) {
-    set!("balances", sender(), initial_supply);
-}
-
-#[export]
-pub fn balance_of(address: Vec<u8>) -> u64 {
-    get!("balances", address)
-}
+use ellipticoin::{
+    error,
+    sender,
+    get_memory,
+    set_memory,
+    error::Error,
+    Value,
+    export,
+};
 
 #[export]
-pub fn transfer(receiver_address: Vec<u8>, amount: u64) -> Result<Value, Error> {
-    let sender_balance: u64 = get!("balances", sender());
-    let receiver_balance: u64 = get!("balances", receiver_address);
-    require!(sender_balance >= amount, error::INSUFFICIENT_FUNDS);
-    set!("balances", sender(), sender_balance - amount);
-    set!("balances", receiver_address, receiver_balance + amount);
-    Ok(Value::Null)
+mod base_token {
+    pub fn constructor(initial_supply: u64) {
+        set_memory(sender(), initial_supply);
+    }
+
+    pub fn balance_of(address: Vec<u8>) -> u64 {
+        get_memory(address)
+    }
+
+    pub fn transfer(receiver_address: Vec<u8>, amount: u64) -> Result<Value, Error> {
+        let sender_balance: u64 = get_memory(sender());
+        let receiver_balance: u64 = get_memory(receiver_address.clone());
+        if sender_balance >= amount {
+            set_memory(sender(), sender_balance - amount);
+            set_memory(receiver_address, receiver_balance + amount);
+            Ok(Value::Null)
+        } else {
+            Err(error::INSUFFICIENT_FUNDS)
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{balance_of, constructor, transfer};
+    use super::*;
     use ellipticoin::set_sender;
     use ellipticoin_test_framework::{alice, bob};
 
@@ -34,7 +41,7 @@ mod tests {
     fn test_transfer() {
         set_sender(alice());
         constructor(100);
-        transfer(bob(), 20);
+        transfer(bob(), 20).unwrap();
         let alices_balance = balance_of(alice());
         assert_eq!(alices_balance, 80);
         let bobs_balance = balance_of(bob());

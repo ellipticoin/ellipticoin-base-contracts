@@ -23,5 +23,6 @@ mock-ellipticoin = {"path" = "../../rust-mock-ellipticoin"}
 [dependencies]
 ellipticoin = {"path" = "../../rust-ellipticoin"}
 wee_alloc = { git = "https://github.com/rustwasm/wee_alloc" }
-wasm-rpc = "0.2.10"
-wasm-rpc-macros = "0.2.10"
+#wasm-rpc = "0.2.10"
+wasm-rpc = {"path" = "../../rust-wasm-rpc/wasm-rpc"}
+wasm-rpc-macros = {"path" = "../../rust-wasm-rpc/wasm-rpc-macros"}
