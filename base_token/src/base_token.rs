@@ -1,12 +1,4 @@
-use ellipticoin::{
-    error,
-    sender,
-    get_memory,
-    set_memory,
-    error::Error,
-    Value,
-    export,
-};
+use ellipticoin::{error, error::Error, export, get_memory, sender, set_memory, Value};
 
 #[export]
 mod base_token {
