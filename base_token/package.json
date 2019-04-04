@@ -12,17 +12,13 @@
   "author": "Mason Fischer",
   "license": "MIT",
   "devDependencies": {
-    "simple-wasm": "file:../simple-wasm",
-    "wasm-rpc": "^0.2.1"
+    "wasm-rpc": "^0.2.1",
+    "long": "^4.0.0"
   },
   "dependencies": {
     "@webassemblyjs/wasm-edit": "^1.8.1",
     "cryptojs": "^2.5.3",
-    "node-forge": "^0.7.5",
-    "npm": "^5.7.1",
-    "protobufjs": "^6.8.4",
-    "to": "^0.2.9",
-    "update": "^0.7.4"
+    "long": "^4.0.0"
   },
   "description": ""
 }
