@@ -8,26 +8,32 @@ class BaseContractClient extends WasmRPC {
   constructor(params) {
     super({
       exports: {
-      rust_begin_unwind: () => null,
-      _sender: () => {
-        return this.writePointer(params.defaultSender);
-      },
-      _get_memory: (keyPtr) => {
-        var key = this.readPointer(keyPtr);
-        if(this.getMemory(key)) {
-          return this.writePointer(this.memory[key]);
-        } else {
-          return this.writePointer(new Uint8Array([]));
-        }
-      },
-      _set_memory: (keyPtr, valuePtr) => {
-        var key = this.readPointer(keyPtr);
-        var value = this.readPointer(valuePtr);
+        rust_begin_unwind: () => null,
+        __sender: () => {
+          return this.writePointer(params.defaultSender);
+        },
+        __block_winner: () => {
+          return this.writePointer(null);
+        },
+        __block_number: () => {
+          return this.writePointer(0);
+        },
+        __get_memory: (keyPtr) => {
+          var key = this.readPointer(keyPtr);
+          if(this.getMemory(key)) {
+            return this.writePointer(this.memory[key]);
+          } else {
+            return this.writePointer(new Uint8Array([]));
+          }
+        },
+        __set_memory: (keyPtr, valuePtr) => {
+          var key = this.readPointer(keyPtr);
+          var value = this.readPointer(valuePtr);
 
-        this.memory[key] = value;
-        this.setMemory(key, value);
-      },
-      throw: console.log,
+          this.memory[key] = value;
+          this.setMemory(key, value);
+        },
+        throw: console.log,
         rust_oom: () => null,
         __udivti3: () => null,
         __multi3: () => null,
