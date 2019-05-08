@@ -21,3 +21,4 @@ extern crate mock_ellipticoin as ellipticoin;
 
 pub mod base_token;
 mod issuance;
+mod errors;

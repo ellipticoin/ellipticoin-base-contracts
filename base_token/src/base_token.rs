@@ -1,8 +1,10 @@
 use ellipticoin::{
-    block_number, block_winner, error, error::Error, export, get_memory, sender, set_memory, Value,
+    block_number, block_winner, export, get_memory, sender, set_memory, Value,
 };
 pub use wasm_rpc::{Bytes, Dereferenceable, FromBytes, Referenceable, ToBytes};
 use issuance;
+use errors;
+use wasm_rpc::error::Error;
 
 enum Namespace {
     Balances,
@@ -29,7 +31,7 @@ mod base_token {
             credit(to, amount);
             Ok(Value::Null)
         } else {
-            Err(error::INSUFFICIENT_FUNDS)
+            Err(errors::INSUFFICIENT_FUNDS)
         }
     }
 
@@ -39,7 +41,7 @@ mod base_token {
             credit(to, amount);
             Ok(Value::Null)
         } else {
-            Err(error::INSUFFICIENT_FUNDS)
+            Err(errors::INSUFFICIENT_FUNDS)
         }
     }
 
@@ -49,7 +51,7 @@ mod base_token {
             mark_block_as_minted(block_number());
             Ok(Value::Null)
         } else {
-            Err(error::INSUFFICIENT_FUNDS)
+            Err(errors::BLOCK_ALREADY_MINTED)
         }
     }
 
